@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <button onclick="start()">start</button>
+    <button onclick="stop()">stop</button>
+    <button onclick="update()">stop</button>
+    <br>
+    <br>
+    <div class="form-group">
+        <label>K</label>
+        <input type="text" class="form-control" id="k">
+    </div>
+    <div class="form-group">
+        <label>sliding_step_time</label>
+        <input type="text" class="form-control" id="sliding_step_time">
+    </div>
+    <div class="form-group">
+        <label>sliding_window_time</label>
+        <input type="text" class="form-control" id="sliding_window_time">
+    </div>
+    <button class="btn btn-info" onclick="update()">更新</button>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+
+
+    $(function () {
+        showAP()
+    })
+
+    function update() {
+
+        $.get("/update",{k:$("#k").val(),sliding_step_time:$("#sliding_step_time").val(),sliding_window_time:$("#sliding_window_time").val()})
+        showAP()
+    }
+
+    function showAP() {
+        $.get("/showAP",function (ans) {
+            console.log(ans)
+        })
+    }
+
+    function start() {
+        $.get("/start")
+    }
+    function stop() {
+        $.get("/stop")
+    }
+
+</script>
+</html>

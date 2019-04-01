@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-table/1.13.5/bootstrap-table.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="row">
+        <div class="col-10" id="showArea">
+            <canvas width="1610" height="800" id="map"></canvas>
+        </div>
+        <div class="col-2">
+            <ul class="list-group" id="lg">
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        <div class="bootstrap-table">
+            <div class="fixed-table-container" style="padding-bottom: 0px;">
+                <div class="fixed-table-header" style="display: none;"><table></table></div>
+                <div class="fixed-table-body">
+                    <div class="fixed-table-loading" style="top: 51px; display: none;">
+                        Loading, please wait...
+                    </div>
+                    <table id="table" data-toggle="bootstrap-table" data-search="true" class="table table-bordered table-hover"></table>
+                </div>
+                <div class="fixed-table-footer" style="display: none;">
+            </div>
+            <div class="fixed-table-pagination" style="display: none;"></div>
+        </div>
+
+    </div>
+        <table id="heatMapTable" class="table table-bordered table-hover"></table>
+   </div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/heatmap.js/2.0.2/heatmap.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/locale/bootstrap-table-zh-CN.min.js"></script>
+<script>
+    $(function () {
+        buildMap();
+        // buildTable();
+
+        setInterval(getLocInfo,1000);
+        //setInterval(getHeatMapData,5000);
+        
+    })
+    
+    function buildTable() {
+        $('#table').bootstrapTable({
+            queryParams: "queryParams",
+            toolbar: "#toolbar",
+            sidePagination: "true",
+            striped: true, // 是否显示行间隔色
+            search : "true",
+            // uniqueId: "ID",
+            pageSize: "5",
+            pagination: true, // 是否分页
+            sortable: true, // 是否启用排序
+            columns: [{
+                field: 'mac',
+                title: '设备Mac'
+            },
+            {
+                field: 'scanTime',
+                title: '嗅探时间'
+            },
+            {
+                field: 'updateTime',
+                title: '定位时间'
+            },
+            {
+                field: 'x',
+                title: 'x坐标'
+            },{
+                field: 'y',
+                title: 'y坐标'
+            },
+            {
+                field: 'confidence',
+                title: '确信度'
+            }]
+        });
+        $("#heatMapTable").bootstrapTable({
+            striped: true, // 是否显示行间隔色
+            search : "true",
+            sortable: true, // 是否启用排序
+            height:500,
+            columns: [{
+                field: 'id',
+                title: '晶格ID',
+                sortable : true
+            },
+            {
+                field: 'deviceDensity',
+                title: '设备密度',
+                sortable : true
+            },
+            {
+                field: 'newDensity',
+                title: '新密度',
+                sortable : true
+            },
+            {
+                field: 'x',
+                title: 'x坐标'
+            },{
+                field: 'y',
+                title: 'y坐标'
+            }
+            ]
+        });
+    }
+    var heatmapInstance = h337.create({
+        // only container is required, the rest will be defaults
+        container: document.getElementById("showArea")
+    });
+    function buildMap() {
+        var c=document.getElementById("map");
+        var cxt=c.getContext("2d");
+
+        cxt.rect(640,496,712,304);
+        cxt.rect(1352,235.2,236,564.8)
+
+        cxt.stroke();
+
+        //过道
+        cxt.beginPath();
+        cxt.moveTo(122.4,160)
+        cxt.lineTo(122.4,496)
+        cxt.lineTo(1352,496)
+        cxt.lineTo(1352,235.2)
+        cxt.lineTo(1588,235.2)
+        cxt.lineTo(1588,145.2)
+        cxt.lineTo(1249.2,145.2)
+        cxt.lineTo(1249.2,420)
+        cxt.lineTo(242.4,420)
+        cxt.lineTo(242.4,160)
+        cxt.lineTo(122.4,160)
+        cxt.closePath();
+        cxt.stroke();
+
+        //仓库
+        cxt.beginPath();
+        cxt.rect(122.4,496,517.6,304)
+        cxt.closePath();
+        cxt.stroke();
+
+        cxt.beginPath();
+        //办公室1
+        cxt.rect(1151.2,633.6,200.8,166.4)
+        //办公室2
+        cxt.rect(1352,633.6,236,166.4)
+        cxt.closePath();
+        cxt.stroke();
+        getAPLoc();
+    }
+
+    function getAPLoc() {
+        $.get("/getAPsInfo",function (aps) {
+
+            var c=document.getElementById("map");
+            var cxt=c.getContext("2d");
+            var img=new Image()
+            img.src="phone.png"
+            $.each(aps,function(index,ap){
+                console.log(ap.x+" "+ap.y)
+                // cxt.drawImage(img,ap.x,ap.y);
+                cxt.fillStyle="#FF0000";
+                cxt.beginPath();
+                cxt.arc(ap.x*40,ap.y*40,10,0,Math.PI*2,true)
+                cxt.closePath();
+                cxt.fill();
+
+            });
+        })
+    }
+    function getLocInfo() {
+        $.get("/getLocInfo", function(ans){
+            var c=document.getElementById("map");
+            var cxt=c.getContext("2d");
+            c.height=c.height;
+            buildMap();
+            getAPLoc()
+            $('#table').bootstrapTable('load',ans);
+            $.each(ans,function(index,dev){
+                cxt.fillStyle="rgba(142, 68, 173,0.3)";
+                cxt.beginPath();
+                cxt.arc(dev.x*40,dev.y*40,dev.confidence*10,0,Math.PI*2,true)
+                cxt.closePath();
+                cxt.fill();
+            });
+    
+        });
+    }
+
+    function getHeatMapData() {
+        var points = [];
+        var max = 0;
+        $.get("/getHeatMapData",function (ans) {
+            var hdata = []
+            $.each(ans.deviceDensity,function(index,dev){
+                max = Math.max(max, dev);
+                var point = {
+                    x: ans.posX[index],
+                    y: ans.posY[index],
+                    value: dev,
+                };
+                points.push(point);
+
+                var hi = {
+                    x: ans.posX[index],
+                    y: ans.posY[index],
+                    deviceDensity: dev,
+                    newDensity:ans.newDensity[index],
+                    id:index
+                };
+                hdata.push(hi)
+            })
+
+            var data = {
+                max: max,
+                data: points
+            };
+            console.log(data)
+            heatmapInstance.setData(data);
+            $("#heatMapTable").bootstrapTable('load',hdata);
+        })
+    }
+
+
+    
+</script>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=11, user-scalable=1">
+    <title>测试定位页面</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+<body>
+
+
+<div class="row">
+    <div class="col-8">
+        <input class="form-control" disabled="true" id="gridId">
+    </div>
+    <div class="col-4">
+        <span id="timer">0</span>
+    </div>
+</div>
+
+<button class="btn btn-info btn-block" style="margin-top: 10px" id="btn_start">开始</button>
+
+<button class="btn btn-info btn-block" style="margin-top: 10px" id="btn_stop">结束</button>
+
+<div class="container" style="margin-top: 10px">
+    <table class="table table-responsive" id="table">
+
+    </table>
+</div>
+<
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script>
+
+    $(function () {
+        refresh()
+    })
+
+    var runTag = false;
+
+    function refresh() {
+        $("#table").empty();
+        $.get("/getGridInfo", function (ans) {
+            $("#table").append("<tr>")
+            $.each(ans, function (index, item) {
+                if (item.value == 1) {
+                    $("#table").append("<td id='td_" + item.key + "'onclick='setGridId(this," + item.key + ")'  style='background-color: blueviolet'>" + item.key + "</td>")
+                } else {
+                    $("#table").append("<td id='td_" + item.key + "'onclick='setGridId(this," + item.key + ")'>" + item.key + "</td>")
+                }
+
+                if ((index + 1) % 8 == 0 || index == 80) {
+                    $("#table").append("</tr>")
+                    if (index != 80) {
+                        $("#table").append("<tr>")
+                    }
+                }
+            })
+        })
+    }
+
+    var oldSelectId;
+
+    function setGridId(td, id) {
+        if (runTag == true) {
+            //最好服务的做判断
+            alert("已经开始了,请先结束任务")
+            return;
+        }
+
+        console.log($(td).css("background-color"));
+
+        if ($(td).css("background-color") != 'rgba(0, 0, 0, 0)'&&$(td).css("background-color") != 'rgb(255, 255, 255)') {
+            alert("不能重复选择");
+            return;
+        }
+
+        if (oldSelectId != null&&$("#td_"+oldSelectId).css("background-color")!='rgb(138, 43, 226)') {
+            $("#td_" + oldSelectId).css({"background": "white"});
+        }
+
+        if (id != null && id != '') {
+            $.get("/modifyLattId", {id: id}, function (ans) {
+                if (ans == id) {
+                    $(td).css({"background": "yellow"});
+                    $("#gridId").val(id)
+                    oldSelectId = id;
+                } else {
+                    alert("设置失败");
+                }
+//                alert(ans)
+            })
+        }
+    }
+
+    var cur = 0;
+    var timer;
+    $("#btn_start").click(function () {
+        if (timer != null) {
+            return;
+        }
+
+        if($("#gridId").val()==null||$("#gridId").val()==''||$("#gridId").val()=='undefined'){
+            alert("请先选择要测试的晶格");
+            return;
+        }
+
+        if (runTag == true) {
+            //最好服务的做判断
+            alert("已经开始了")
+            return;
+        }
+        runTag = true;
+        $.get("/start", function (ans) {
+            timer = setInterval(function () {
+                console.log("ok...")
+                $("#timer").html(++cur);
+            }, 1000)
+//            alert(ans)
+
+        })
+    })
+
+    $("#btn_stop").click(function () {
+        if (runTag == false) {
+            alert("已经结束了")
+            return;
+        }
+        runTag = false;
+        $.get("/stop", function (ans) {
+            clearInterval(timer)
+            timer = null;
+            cur = 0;
+            $("#timer").html(cur);
+            refresh()
+        })
+    })
+
+
+</script>
+
+</body>
+</html>

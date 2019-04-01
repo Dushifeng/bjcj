@@ -1,0 +1,15 @@
+server:
+  port: 8080
+spring:
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/templates/,classpath:/static/
+  thymeleaf:
+    cache: false
+  data:
+    mongodb:
+      uri: mongodb://192.168.0.148:27017/bjcj
+udp:
+  port: 16662
+  open: false
