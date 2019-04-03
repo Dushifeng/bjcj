@@ -136,6 +136,249 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header card-header-icon card-header-rose">
+                                <div class="card-icon">
+                                    <i class="material-icons">wifi_tethering</i>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title">任务配置</h4>
+                                <table class="table" ap_id="">
+                                    <tbody >
+                                        <tr>
+                                            <td class="text-center">UDP服务器</td>
+                                            <td>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="openUDP" id="inlineRadio1" value="open"> 开启
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" checked type="radio" name="openUDP" id="inlineRadio2" value="close"> 暂停
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">MAC-Allow</td>
+                                            <td>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="mac_allow_open"  value="open"> 开启
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" checked type="radio" name="mac_allow_open"  value="close"> 关闭
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">MAC-Refuse</td>
+                                            <td>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="mac_refuse_open"  value="open"> 开启
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" checked type="radio" name="mac_refuse_open"  value="close"> 关闭
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">WKNN-K值</td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" >
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">秒</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">算法调用周期</td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <input type="number" class="form-control" >
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <div class="form-check form-check-radio form-check-inline">
+                                                            <label class="form-check-label">
+                                                                <input class="form-check-input" type="radio" name="algorithm_open"  value="open"> 开启
+                                                                <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-radio form-check-inline">
+                                                            <label class="form-check-label">
+                                                                <input class="form-check-input" checked type="radio" name="algorithm_open" value="close"> 暂停
+                                                                <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">数据缓存时长</td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <input type="number" class="form-control" >
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <div class="form-check form-check-radio form-check-inline">
+                                                            <label class="form-check-label">
+                                                                <input class="form-check-input" type="radio" name="cache_windows_open"  value="open"> 开启
+                                                                <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-radio form-check-inline">
+                                                            <label class="form-check-label">
+                                                                <input class="form-check-input" checked type="radio" name="cache_windows_open" value="close"> 暂停
+                                                                <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">数据均值处理</td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <input type="number" class="form-control" >
+                                                    </div>
+                                                   <div class="col-8">
+                                                       <div class="form-check form-check-radio form-check-inline">
+                                                           <label class="form-check-label">
+                                                               <input class="form-check-input" type="radio" name="data_open"  value="open"> 开启
+                                                               <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                           </label>
+                                                       </div>
+                                                       <div class="form-check form-check-radio form-check-inline">
+                                                           <label class="form-check-label">
+                                                               <input class="form-check-input" checked type="radio" name="data_open" value="close"> 暂停
+                                                               <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                           </label>
+                                                       </div>
+                                                   </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">原始数据Log</td>
+                                            <td>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="raw_log_open" value="open"> 开启
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" checked type="radio" name="raw_log_open"  value="close"> 暂停
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">均值Log</td>
+                                            <td>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="raw_log_open" value="open"> 开启
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" checked type="radio" name="raw_log_open"  value="close"> 暂停
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">均值Log</td>
+                                            <td>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="raw_log_open" value="open"> 开启
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-radio form-check-inline">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" checked type="radio" name="raw_log_open"  value="close"> 暂停
+                                                        <span class="circle">
+                                                            <span class="check"></span>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary">保存应用</button>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -318,6 +561,8 @@
 
         })
     }
+
+
 
     $("#macAllowAddBtn").click(function () {
         var html = "<tr id=\"temp_tr\">\n" +

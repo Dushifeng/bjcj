@@ -23,15 +23,14 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     public static boolean startTag = true;
 //    public static int latticeId;
-    DataUtils dataUtils;
-    DataFilter dataFilter;
 
+    DataUtils dataUtils;
 
 
 //    LogUtil logUtil;
 //    LogConf logConf;
     public UDPServerHandler() {
-//        dataUtils = SpringUtil.getBean(DataUtils.class);
+        dataUtils = SpringUtil.getBean(DataUtils.class);
 //        dataFilter = SpringUtil.getBean(DataFilter.class);
 //        logUtil = SpringUtil.getBean(LogUtil.class);
 //        logConf = SpringUtil.getBean(LogConf.class);
@@ -45,21 +44,33 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             return;
         }
         String s = ByteBufUtil.hexDump(datagramPacket.content());
-        System.out.println(s);
-//        String str = dataFilter.filter(s);
+        String str = this.filter(s);
 
-//        if(str!=null){
-//            List<Message> messages = dataUtils.analyzeData(str);
-//            if(messages.size()>0){
-////                logUtil.logRaw(messages);
-//                for(Message message:messages){
-////                    logUtil.log("("+message.getTime()+","+apConf.getApId(message.getApMac())+",'"+message.getApMac()+"','"+message.getDevMac()+"',"+logConf.getGridId()+","+message.getFrequency()+","+message.getRssi()+"),",message.getDevMac()+"_"+logConf.getGridId()+"_"+"raw.log");
-//                }
-//
+        if(str!=null){
+            List<Message> messages = dataUtils.analyzeData(str);
+            if(messages.size()>0){
+//                logUtil.logRaw(messages);
+                for(Message message:messages){
+//                    logUtil.log("("+message.getTime()+","+apConf.getApId(message.getApMac())+",'"+message.getApMac()+"','"+message.getDevMac()+"',"+logConf.getGridId()+","+message.getFrequency()+","+message.getRssi()+"),",message.getDevMac()+"_"+logConf.getGridId()+"_"+"raw.log");
+                    System.out.println(message);
+                }
+
 //                dataUtils.putData(messages);
-//            }
-//        }
+            }
+        }
     }
+
+    public static String filter(String str){
+        //1.长度 2.开头
+        if(str.length()<=58){
+            return null;
+        }else if(!str.substring(0,4).equals("3747")){
+            return null;
+        }
+
+        return str;
+    }
+
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {

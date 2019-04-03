@@ -10,9 +10,7 @@ public class SchedulerService {
 
 
 
-    @Autowired
-    @Qualifier("Scheduler")
-    private Scheduler scheduler;
+
 
 
 

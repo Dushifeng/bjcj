@@ -30,7 +30,6 @@ public class UDPServer{
                     .handler(new UDPServerHandler());
 
             b.bind(port).sync().channel().closeFuture().await();
-
         }finally {
             group.shutdownGracefully().sync();
         }
