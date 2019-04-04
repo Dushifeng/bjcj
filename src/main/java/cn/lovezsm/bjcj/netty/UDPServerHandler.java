@@ -47,15 +47,15 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         String str = this.filter(s);
 
         if(str!=null){
+
             List<Message> messages = dataUtils.analyzeData(str);
             if(messages.size()>0){
 //                logUtil.logRaw(messages);
                 for(Message message:messages){
 //                    logUtil.log("("+message.getTime()+","+apConf.getApId(message.getApMac())+",'"+message.getApMac()+"','"+message.getDevMac()+"',"+logConf.getGridId()+","+message.getFrequency()+","+message.getRssi()+"),",message.getDevMac()+"_"+logConf.getGridId()+"_"+"raw.log");
-                    System.out.println(message);
+//                    System.out.println(message);
                 }
-
-//                dataUtils.putData(messages);
+                dataUtils.putData(messages);
             }
         }
     }
@@ -67,7 +67,6 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         }else if(!str.substring(0,4).equals("3747")){
             return null;
         }
-
         return str;
     }
 

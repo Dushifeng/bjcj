@@ -27,18 +27,18 @@ import java.util.Map;
 @Component
 public class LocationTask extends QuartzJobBean {
 
-    @Autowired
-    DataUtils dataUtils;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
-        int sliding_step_time = dataMap.getInt("sliding_step_time");
+
         int apNum = dataMap.getInt("apNum");
         int k = dataMap.getInt("K");
         FingerPrint fingerPrint = (FingerPrint) dataMap.get("fingerPrint");
+        DataUtils dataUtils = (DataUtils) dataMap.get("dataUtils");
+        int stepTime = dataMap.getInt("stepTime");
 
-        List<Record> records = dataUtils.getAlgorithmData(System.currentTimeMillis()-sliding_step_time*1000);
+        List<Record> records = dataUtils.getAlgorithmData(System.currentTimeMillis()-stepTime*1000);
         Map<String,List<List<Double>>> map = new HashMap<>();
         if(records.size()==0|| UDPServerHandler.startTag==false){
             return;
@@ -84,11 +84,11 @@ public class LocationTask extends QuartzJobBean {
         Map<String, LocalizeReturnVal> result = new HashMap<>();
         List<LocalizeReturnVal> lrs = new ArrayList<>();
         for(Map.Entry<String,Double[]> item:temp.entrySet()){
-            LocalizeReturnVal returnVal = LocalizeByFingerPrint.doCalculate(item.getValue(), k,fingerPrint.getPosX(),fingerPrint.getPosY(),fingerPrint.getAreaGrid(),fingerPrint.getAvg(),fingerPrint.getStd());
-            returnVal.setDevMac(item.getKey());
-            System.out.println(item.getKey()+" : "+returnVal);
-            lrs.add(returnVal);
-            dataUtils.returnVals.add(returnVal);
+//            LocalizeReturnVal returnVal = LocalizeByFingerPrint.doCalculate(item.getValue(), k,fingerPrint.getPosX(),fingerPrint.getPosY(),fingerPrint.getAreaGrid(),fingerPrint.getAvg(),fingerPrint.getStd());
+//            returnVal.setDevMac(item.getKey());
+//            System.out.println(item.getKey()+" : "+returnVal);
+//            lrs.add(returnVal);
+//            dataUtils.returnVals.add(returnVal);
 //            result.put(item.getKey(),returnVal);
 //            lrs.add(returnVal);
         }

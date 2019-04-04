@@ -102,7 +102,7 @@ public class DataUtils {
 
     public void putData(List<Message> data){
         if (dataqueue.addAll(data)){
-//                log.info("add data successful:"+data.substring(64,76));
+//                log.info("add data successful:"+data.size());
         }else {
             log.info("add data failed...");
         }

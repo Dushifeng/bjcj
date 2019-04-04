@@ -3,31 +3,29 @@ package cn.lovezsm.bjcj.task;
 import cn.lovezsm.bjcj.config.APConf;
 import cn.lovezsm.bjcj.entity.Message;
 import cn.lovezsm.bjcj.entity.Record;
-import cn.lovezsm.bjcj.repository.APConfRepository;
 import cn.lovezsm.bjcj.utils.DataUtils;
 import cn.lovezsm.bjcj.utils.LogUtil;
+import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 @Component
 public class ProcessRawDataTask extends QuartzJobBean {
 
-    @Autowired
-    DataUtils dataUtils;
-    @Autowired
-    APConfRepository apConfRepository;
-    @Autowired
-    LogUtil logUtil;
-
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        System.out.println("ProcessRawDataTask working...."+System.currentTimeMillis());
+        JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
+        DataUtils dataUtils = (DataUtils) dataMap.get("dataUtils");
+        APConf apConf = (APConf) dataMap.get("apConf");
+        LogUtil logUtil = (LogUtil) dataMap.get("logUtil");
         List<Message> dl = dataUtils.collectData();
-        APConf apConf = apConfRepository.findAll().get(0);
         if (dl == null || dl.size() == 0) {
             System.err.println("没有采集到数据");
             return;
@@ -89,7 +87,9 @@ public class ProcessRawDataTask extends QuartzJobBean {
         for(Record record:records){
 //            logUtil.log(record.toString(),record.getDevMac()+"_"+logUtil.getLogConf().getGridId()+"_"+"record.log");
         }
-
+        System.out.println("ProcessRawDataTask over...."+records.size());
         dataUtils.putRecord(records);
     }
+
+
 }

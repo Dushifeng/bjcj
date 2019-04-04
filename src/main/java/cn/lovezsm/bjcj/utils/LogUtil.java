@@ -5,8 +5,6 @@ import cn.lovezsm.bjcj.config.LogConf;
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
 import cn.lovezsm.bjcj.entity.Message;
 import cn.lovezsm.bjcj.entity.Record;
-import cn.lovezsm.bjcj.repository.APConfRepository;
-import cn.lovezsm.bjcj.repository.LogRepository;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,32 +20,32 @@ import java.util.List;
 @Scope("singleton")
 public class LogUtil {
     @Autowired
-    APConfRepository apConfRepository;
+    APConf apConf;
     @Autowired
-    LogRepository logRepository;
+    LogConf logConf;
 
 
     public synchronized void log(String content, String fileName){
 
-//        if(logConf.isOpen() == false) return;
-//        File file = new File(logConf.getDicPath()+File.separator+fileName);
-//        FileWriter fileWriter = null;
-//        if (file.getParentFile() != null && !file.getParentFile().exists()) {
-//            file.getParentFile().mkdirs();
-//        }
-//        try {
-//            fileWriter = new FileWriter(file,true);
-//            fileWriter.append(content);
-//            fileWriter.append("\r\n");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                fileWriter.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        if(logConf.isOpen() == false) return;
+        File file = new File(logConf.getDicPath()+File.separator+fileName);
+        FileWriter fileWriter = null;
+        if (file.getParentFile() != null && !file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        try {
+            fileWriter = new FileWriter(file,true);
+            fileWriter.append(content);
+            fileWriter.append("\r\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public synchronized void logRaw(List<Message> messages){

@@ -2,8 +2,6 @@ package cn.lovezsm.bjcj.data;
 
 import cn.lovezsm.bjcj.config.APConf;
 import cn.lovezsm.bjcj.config.MessageConf;
-import cn.lovezsm.bjcj.repository.APConfRepository;
-import cn.lovezsm.bjcj.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -13,14 +11,11 @@ import org.springframework.stereotype.Component;
 public class DataFilter {
 
     @Autowired
-    APConfRepository apConfRepository;
+    APConf apConf;
     @Autowired
-    MessageRepository messageRepository;
-
-
+    MessageConf conf;
 
     public String filter(String str){
-        APConf apConf = apConfRepository.findAll().get(0);
 
         //1.长度 2.开头
         if(str.length()<=58){
@@ -33,16 +28,16 @@ public class DataFilter {
         if(!apConf.containMac(devMac)){
             return null;
         }
-
-
         return str;
     }
 
     public boolean isOKMessage(String mac){
-        MessageConf conf = messageRepository.findAll().get(0);
         if(conf.getMacAllow().size()>0){
             return conf.getMacAllow().contains(mac);
         }
-        return conf.getMacRefuse().contains(mac);
+        if(conf.getMacRefuse().size()>0){
+            return conf.getMacRefuse().contains(mac);
+        }
+        return true;
     }
 }

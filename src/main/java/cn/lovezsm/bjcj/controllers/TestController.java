@@ -1,73 +1,73 @@
 package cn.lovezsm.bjcj.controllers;
 
 
+//
+//import cn.lovezsm.bjcj.config.AlgorithmConf;
+//import cn.lovezsm.bjcj.repository.APConfRepository;
+//import cn.lovezsm.bjcj.repository.AlgorithmRepository;
+//import cn.lovezsm.bjcj.repository.LogRepository;
+//import cn.lovezsm.bjcj.repository.MessageRepository;
+//import org.bson.types.ObjectId;
+//import org.quartz.*;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Qualifier;
+//import org.springframework.data.mongodb.repository.MongoRepository;
+//import org.springframework.stereotype.Controller;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.ResponseBody;
+//import web.ConfData;
+//
+//import javax.annotation.PostConstruct;
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.Map;
+//
+//import static org.quartz.DateBuilder.futureDate;
+//import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+//import static org.quartz.TriggerBuilder.newTrigger;
+//
+//@Controller
+//public class TestController {
+//
+//    @Autowired
+//    APConfRepository apConfRepository;
+//    @Autowired
+//    AlgorithmRepository algorithmRepository;
+//    @Autowired
+//    LogRepository logRepository;
+//    @Autowired
+//    MessageRepository messageRepository;
+//
+//    Map<String, MongoRepository> repositoryMap;
+//
+//    @PostConstruct
+//    public void init(){
+//        repositoryMap = new HashMap<>();
+//        repositoryMap.put("apConfRepository",apConfRepository);
+//        repositoryMap.put("algorithmRepository",algorithmRepository);
+//        repositoryMap.put("logRepository",logRepository);
+//        repositoryMap.put("messageRepository",messageRepository);
+//    }
+//
+//    @Autowired
+//    @Qualifier("Scheduler")
+//    private Scheduler scheduler;
+//
+//
+//    @GetMapping("update")
+//    @ResponseBody
+//    public void update(List<ConfData> data){
+//
+//
+//    }
+//
 
-import cn.lovezsm.bjcj.config.AlgorithmConf;
-import cn.lovezsm.bjcj.repository.APConfRepository;
-import cn.lovezsm.bjcj.repository.AlgorithmRepository;
-import cn.lovezsm.bjcj.repository.LogRepository;
-import cn.lovezsm.bjcj.repository.MessageRepository;
-import org.bson.types.ObjectId;
-import org.quartz.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import web.ConfData;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.quartz.DateBuilder.futureDate;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
-
-@Controller
-public class TestController {
-
-    @Autowired
-    APConfRepository apConfRepository;
-    @Autowired
-    AlgorithmRepository algorithmRepository;
-    @Autowired
-    LogRepository logRepository;
-    @Autowired
-    MessageRepository messageRepository;
-
-    Map<String, MongoRepository> repositoryMap;
-
-    @PostConstruct
-    public void init(){
-        repositoryMap = new HashMap<>();
-        repositoryMap.put("apConfRepository",apConfRepository);
-        repositoryMap.put("algorithmRepository",algorithmRepository);
-        repositoryMap.put("logRepository",logRepository);
-        repositoryMap.put("messageRepository",messageRepository);
-    }
-
-    @Autowired
-    @Qualifier("Scheduler")
-    private Scheduler scheduler;
-
-
-    @GetMapping("update")
-    @ResponseBody
-    public void update(List<ConfData> data){
-
-
-    }
-
-
-
-
-    @GetMapping("/")
-    public String root(){
-        return "starter";
-    }
+//
+//    @GetMapping("/")
+//    public String root(){
+//        return "starter";
+//    }
 
 //    @GetMapping("start")
 //    @ResponseBody
@@ -91,16 +91,16 @@ public class TestController {
 
     //Simple Trigger
 
-    @GetMapping("stop")
-    @ResponseBody
-    public void stop(){
-        System.out.println("stop...");
-        try {
-            scheduler.deleteJob(new JobKey("t1"));
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
-    }
+//    @GetMapping("stop")
+//    @ResponseBody
+//    public void stop(){
+//        System.out.println("stop...");
+//        try {
+//            scheduler.deleteJob(new JobKey("t1"));
+//        } catch (SchedulerException e) {
+//            e.printStackTrace();
+//        }
+//    }
 //
 //    /**
 //     * getGridList
@@ -241,4 +241,4 @@ public class TestController {
 //    }
 
 
-}
+//}

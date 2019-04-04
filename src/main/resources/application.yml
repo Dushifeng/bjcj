@@ -59,10 +59,10 @@ message:
     06: indirect-ap
   rssi-min: -110
   mac-allow:
-    #    - 240995b2909c
+#    - 240995b2909c
     - 8844771b6789
-  #    - 34d712a2e3dc
-  #    - b8bc1bdbeadd
+#    - 34d712a2e3dc
+#    - b8bc1bdbeadd
   mac-refuse:
 
 fingerprint:

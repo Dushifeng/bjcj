@@ -95,5 +95,18 @@ public class Message {
         this.apMac = apMac;
     }
 
-
+    @Override
+    public String toString() {
+        return "Message{" +
+                "type='" + type + '\'' +
+                ", devMac='" + devMac + '\'' +
+                ", frameCtrl='" + frameCtrl + '\'' +
+                ", frequency=" + frequency +
+                ", snFirst='" + snFirst + '\'' +
+                ", snLast='" + snLast + '\'' +
+                ", rssi=" + rssi +
+                ", apMac='" + apMac + '\'' +
+                ", time=" + time +
+                '}';
+    }
 }

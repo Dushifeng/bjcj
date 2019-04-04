@@ -1,7 +1,12 @@
 package cn.lovezsm.bjcj;
 
+import cn.lovezsm.bjcj.data.FingerPrint;
+import cn.lovezsm.bjcj.data.FingerPrintBuilder;
+import cn.lovezsm.bjcj.data.FingerPrintBuilderByFile;
+import cn.lovezsm.bjcj.data.GridMap;
 import cn.lovezsm.bjcj.entity.Record;
 import cn.lovezsm.bjcj.utils.AlgorithmUtils;
+import cn.lovezsm.bjcj.utils.FileUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -10,11 +15,31 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class CommonTests {
+
+    @Test
+    public void testFileUtil() throws IOException {
+        System.out.println(FileUtil.getTotalLines(new File("C:\\data\\Fingerprint_avg.dat")));
+    }
+
+    @Test
+    public void testGrid(){
+        GridMap gridMap = GridMap.buildByFile(new File("C:\\data\\grid.txt"),"测试晶格");
+        System.out.println(gridMap);
+    }
+    @Test
+    public void testFingerPrint(){
+        FingerPrintBuilder fingerPrintBuilder = new FingerPrintBuilderByFile("测试指纹库",new File("C:\\data\\Fingerprint_avg.dat"),new File("C:\\data\\Fingerprint_std.dat"),6);
+        FingerPrint finger = fingerPrintBuilder.build(true);
+        System.out.println(finger);
+    }
+
     @Test
     public void test1(){
         System.out.println(0xaa-256);

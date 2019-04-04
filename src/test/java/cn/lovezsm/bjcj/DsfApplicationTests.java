@@ -3,7 +3,7 @@ package cn.lovezsm.bjcj;
 import cn.lovezsm.bjcj.config.APConf;
 import cn.lovezsm.bjcj.config.AlgorithmConf;
 import cn.lovezsm.bjcj.entity.AP;
-import cn.lovezsm.bjcj.repository.APConfRepository;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class DsfApplicationTests {
     @Autowired
     AlgorithmConf algorithmConf;
     @Autowired
-    APConfRepository apConfRepository;
+    APConf apConf;
     @Test
     public void testMongo(){
         System.out.println("ok");
@@ -41,7 +41,7 @@ public class DsfApplicationTests {
         aps.add(new AP("70476002A30F",22,19.3,4));
         aps.add(new AP("70476002A30A",27,13.8,5));
         apconf.setInfo(aps);
-        apConfRepository.save(apconf);
+
     }
 
 

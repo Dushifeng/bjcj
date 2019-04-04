@@ -2,8 +2,6 @@ package cn.lovezsm.bjcj.service;
 
 import cn.lovezsm.bjcj.algorithm.CalculateDeviceDensity;
 import cn.lovezsm.bjcj.algorithm.LocalizeByFingerPrint;
-import cn.lovezsm.bjcj.repository.APConfRepository;
-import cn.lovezsm.bjcj.repository.AlgorithmRepository;
 
 import cn.lovezsm.bjcj.utils.DataUtils;
 import cn.lovezsm.bjcj.data.FingerPrint;
@@ -19,10 +17,7 @@ public class LocationService {
     LocalizeByFingerPrint lbfp;
     @Autowired
     DataUtils dataUtils;
-    @Autowired
-    AlgorithmRepository algorithmRepository;
-    @Autowired
-    APConfRepository apConfRepository;
+
     @Autowired
     FingerPrint fingerPrint;
 
