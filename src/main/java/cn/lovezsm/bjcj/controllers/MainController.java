@@ -1,7 +1,6 @@
 package cn.lovezsm.bjcj.controllers;
 
-import cn.lovezsm.bjcj.config.APConf;
-import cn.lovezsm.bjcj.utils.DataUtils;
+import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.entity.*;
 import cn.lovezsm.bjcj.service.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ public class MainController {
 
 
     @Autowired
-    DataUtils dataUtils;
+    DataUtil dataUtil;
     @Autowired
     LocationService ls = new LocationService();
 
@@ -28,9 +27,10 @@ public class MainController {
     }
     @GetMapping("/getLocInfo")
     @ResponseBody
-    public List<WebShowLocData> getLocInfo(){
+    public List<LocalizeReturnVal> getLocInfo(){
 //        List<WebShowLocData> datas = ls.test1();
-        return null;
+        List<LocalizeReturnVal> locVal = dataUtil.getLocVal();
+        return locVal;
     }
     @ResponseBody
     @GetMapping("/getHeatMapData")

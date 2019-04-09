@@ -9,7 +9,7 @@
 <body>
     <div class="row">
         <div class="col-10" id="showArea">
-            <canvas width="1610" height="800" id="map"></canvas>
+            <canvas width="1700" height="800" id="map"></canvas>
         </div>
         <div class="col-2">
             <ul class="list-group" id="lg">
@@ -157,7 +157,12 @@
         cxt.rect(1352,633.6,236,166.4)
         cxt.closePath();
         cxt.stroke();
-        getAPLoc();
+
+        // cxt.fillStyle="rgba(142, 68, 173,0.3)";
+        // cxt.beginPath();
+        // cxt.arc(40.999748022981414*40,4.093676593535858*40,10,0,Math.PI*2,true)
+        // cxt.closePath();
+        // cxt.fill();
     }
 
     function getAPLoc() {
@@ -180,19 +185,26 @@
         })
     }
     function getLocInfo() {
+        var colorMap = {'240995b2909c':'#FF6600',
+                        '8844771b6789':'#0066FF',
+                        '34d712a2e3dc':'#00CC66'}
+
         $.get("/getLocInfo", function(ans){
             var c=document.getElementById("map");
             var cxt=c.getContext("2d");
             c.height=c.height;
             buildMap();
-            getAPLoc()
-            $('#table').bootstrapTable('load',ans);
+            // getAPLoc()
+            // $('#table').bootstrapTable('load',ans);
+            console.log(ans)
             $.each(ans,function(index,dev){
-                cxt.fillStyle="rgba(142, 68, 173,0.3)";
+                cxt.fillStyle=colorMap[dev.devMac];
                 cxt.beginPath();
-                cxt.arc(dev.x*40,dev.y*40,dev.confidence*10,0,Math.PI*2,true)
+                // cxt.arc(dev.x*40,dev.y*40,dev.confidence*10,0,Math.PI*2,true)
+                cxt.arc(dev.x*40,dev.y*40,15,0,Math.PI*2,true)
                 cxt.closePath();
                 cxt.fill();
+
             });
     
         });

@@ -1,6 +1,7 @@
 package cn.lovezsm.bjcj.utils;
 
 import cn.lovezsm.bjcj.config.APConf;
+import cn.lovezsm.bjcj.config.GlobeConf;
 import cn.lovezsm.bjcj.config.LogConf;
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
 import cn.lovezsm.bjcj.entity.Message;
@@ -19,8 +20,7 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class LogUtil {
-    @Autowired
-    APConf apConf;
+
     @Autowired
     LogConf logConf;
 
@@ -70,5 +70,9 @@ public class LogUtil {
 //        if(logConf.isOpen() == false) return;
 //        String json = JSON.toJSONString(returnVals);
 //        this.log(json,logConf.getLocResultPath());
+    }
+
+    public LogConf getLogConf() {
+        return logConf;
     }
 }

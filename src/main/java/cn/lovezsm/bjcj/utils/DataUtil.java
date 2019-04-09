@@ -18,16 +18,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 @Scope("singleton")
-public class DataUtils {
+public class DataUtil {
 
     private BlockingQueue<Message> dataqueue = new LinkedBlockingQueue<Message>();
     private BlockingQueue<Record> recordqueue = new LinkedBlockingQueue<>();
     public BlockingQueue<LocalizeReturnVal> returnVals = new LinkedBlockingQueue<>();
 
-    private final Logger log= LoggerFactory.getLogger(DataUtils.class);
+    private final Logger log= LoggerFactory.getLogger(DataUtil.class);
 
-    @Autowired
-    FingerPrint fingerPrint;
+
     @Autowired
     DataFilter dataFilter;
 
@@ -67,6 +66,8 @@ public class DataUtils {
 //        return ans;
 //
 //    }
+
+
  public List<Message> analyzeData(String rawData){
         Long scanTime=System.currentTimeMillis();
         List<Message> messages = new ArrayList<>();
@@ -99,6 +100,20 @@ public class DataUtils {
 
     }
 
+    public List<LocalizeReturnVal> getLocVal(){
+        List<LocalizeReturnVal> ans = new ArrayList();
+        ans.addAll(returnVals);
+        return ans;
+    }
+
+    public void updateLocVal(LocalizeReturnVal localizeReturnVal){
+        for (LocalizeReturnVal item:returnVals){
+            if(item.getDevMac().equals(localizeReturnVal.getDevMac())){
+                returnVals.remove(item);
+            }
+        }
+        returnVals.add(localizeReturnVal);
+    }
 
     public void putData(List<Message> data){
         if (dataqueue.addAll(data)){

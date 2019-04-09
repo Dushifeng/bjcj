@@ -1,10 +1,8 @@
 package cn.lovezsm.bjcj.netty;
 
-import cn.lovezsm.bjcj.config.APConf;
-import cn.lovezsm.bjcj.config.LogConf;
-import cn.lovezsm.bjcj.data.DataFilter;
+import cn.lovezsm.bjcj.config.GlobeConf;
 import cn.lovezsm.bjcj.entity.Message;
-import cn.lovezsm.bjcj.utils.DataUtils;
+import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.utils.LogUtil;
 import cn.lovezsm.bjcj.utils.SpringUtil;
 import io.netty.buffer.ByteBufUtil;
@@ -14,7 +12,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -24,23 +21,24 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
     public static boolean startTag = true;
 //    public static int latticeId;
 
-    DataUtils dataUtils;
+    DataUtil dataUtil;
+    GlobeConf globeConf;
 
-
-//    LogUtil logUtil;
+    LogUtil logUtil;
 //    LogConf logConf;
     public UDPServerHandler() {
-        dataUtils = SpringUtil.getBean(DataUtils.class);
+        dataUtil = SpringUtil.getBean(DataUtil.class);
 //        dataFilter = SpringUtil.getBean(DataFilter.class);
-//        logUtil = SpringUtil.getBean(LogUtil.class);
+        logUtil = SpringUtil.getBean(LogUtil.class);
 //        logConf = SpringUtil.getBean(LogConf.class);
+        globeConf = SpringUtil.getBean(GlobeConf.class);
     }
 
     private static final Logger log= LoggerFactory.getLogger(UDPServerHandler.class);
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket datagramPacket) throws Exception {
         if(startTag==false){
-            dataUtils.clearUpRecord(null);
+            dataUtil.clearUpRecord(null);
             return;
         }
         String s = ByteBufUtil.hexDump(datagramPacket.content());
@@ -48,14 +46,14 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
         if(str!=null){
 
-            List<Message> messages = dataUtils.analyzeData(str);
+            List<Message> messages = dataUtil.analyzeData(str);
             if(messages.size()>0){
 //                logUtil.logRaw(messages);
                 for(Message message:messages){
-//                    logUtil.log("("+message.getTime()+","+apConf.getApId(message.getApMac())+",'"+message.getApMac()+"','"+message.getDevMac()+"',"+logConf.getGridId()+","+message.getFrequency()+","+message.getRssi()+"),",message.getDevMac()+"_"+logConf.getGridId()+"_"+"raw.log");
+                    logUtil.log(message.getTime()+","+message.getApMac()+","+message.getDevMac()+","+logUtil.getLogConf().getGridId()+","+globeConf.getApConf().getApId(message.getApMac())+","+message.getFrequency()+","+message.getRssi(),message.getDevMac()+logUtil.getLogConf().getLogPath()+"raw.log");
 //                    System.out.println(message);
                 }
-                dataUtils.putData(messages);
+                dataUtil.putData(messages);
             }
         }
     }

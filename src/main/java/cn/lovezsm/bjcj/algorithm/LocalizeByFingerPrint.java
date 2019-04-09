@@ -1,15 +1,13 @@
 package cn.lovezsm.bjcj.algorithm;
 
 import cn.lovezsm.bjcj.data.FingerPrint;
+import cn.lovezsm.bjcj.data.GridMap;
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
-import cn.lovezsm.bjcj.utils.AlgorithmUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.lovezsm.bjcj.utils.AlgorithmUtil;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * %% 指纹定位算法
@@ -39,38 +37,36 @@ import java.util.List;
 @Scope("singleton")
 public class LocalizeByFingerPrint {
 
-    public static LocalizeReturnVal doCalculate(Double[] rssi,int k,double[] posX,double[] posY,double[] areaGrid,Double[][] avg,Double[][] std){
-        //标准化rssi
-        AlgorithmUtils.VectorStandardization(rssi);
-        int gridNum = posX.length;
+    public static LocalizeReturnVal doCalculate(Double[] rssi, int k, FingerPrint fingerPrint, GridMap gridMap){
+
+        if(fingerPrint.isStandardization()){
+            //标准化rssi
+            AlgorithmUtil.VectorStandardization(rssi);
+        }
+        int gridNum = gridMap.getPosX().length;
         LocalizeReturnVal returnVal = new LocalizeReturnVal();
         int apNum = rssi.length;
-        double fFusion[] = AlgorithmUtils.getMatrix(gridNum,1);
+        double fFusion[] = AlgorithmUtil.getMatrix(gridNum,1);
         for(int i =0;i<apNum;i++){
-            //该AP未探测到当前设备，因此不进行计算
-            if(rssi[i]==null){
-                rssi[i]= -100d;
-            }
             //计算该AP在每一个晶格探测到该设备的概率值
-            double[] fFusionTemp = AlgorithmUtils.getMatrix(gridNum,0);
+            double[] fFusionTemp = AlgorithmUtil.getMatrix(gridNum,0);
             for (int ng =0;ng<gridNum;ng++){
                 // (1/(sqrt(2*pi)*rssStd(num_grid, j )))*exp((rss(j)-rssMean(num_grid,j))^2/(-2*rssStd(num_grid,j)^2));
-                fFusionTemp[ng] = (1/(Math.sqrt(2*Math.PI)*std[ng][i]))*Math.exp((rssi[i]-avg[ng][i])*(rssi[i]-avg[ng][i])/(-2*std[ng][i]*std[ng][i]));
+                fFusionTemp[ng] = (1/(Math.sqrt(2*Math.PI)*fingerPrint.getStd()[ng][i]))*Math.exp((rssi[i]-fingerPrint.getAvg()[ng][i])*(rssi[i]-fingerPrint.getAvg()[ng][i])/(-2*fingerPrint.getStd()[ng][i]*fingerPrint.getStd()[ng][i]));
                //累乘概率值，得到该设备在每一个晶格的似然值
                 fFusion[ng] = fFusion[ng]*fFusionTemp[ng];
             }
         }
-        int[] fusionIdx =  AlgorithmUtils.getSortedIndex(fFusion,k);
+        int[] fusionIdx =  AlgorithmUtil.getSortedIndex(fFusion,k);
         //根据晶格面积修正似然值
-        if(areaGrid.length == gridNum){
-            for(int i = 0;i<gridNum;i++){
-                fFusion[i]=fFusion[i]*areaGrid[i];
-            }
+        for(int i = 0;i<gridNum;i++){
+            fFusion[i]=fFusion[i]*gridMap.getPosH()[i]*gridMap.getPosW()[i];
         }
-        AlgorithmUtils.normalized(fFusion);
+
+        AlgorithmUtil.normalized(fFusion);
         //使用WKNN算法，计算位置估计
-        double x = AlgorithmUtils.multiplication(posX,fFusion);
-        double y = AlgorithmUtils.multiplication(posY,fFusion);
+        double x = AlgorithmUtil.multiplication(gridMap.getPosX(),fFusion);
+        double y = AlgorithmUtil.multiplication(gridMap.getPosY(),fFusion);
         returnVal.setX(x);
         returnVal.setY(y);
 

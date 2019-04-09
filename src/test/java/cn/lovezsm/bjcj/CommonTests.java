@@ -5,7 +5,7 @@ import cn.lovezsm.bjcj.data.FingerPrintBuilder;
 import cn.lovezsm.bjcj.data.FingerPrintBuilderByFile;
 import cn.lovezsm.bjcj.data.GridMap;
 import cn.lovezsm.bjcj.entity.Record;
-import cn.lovezsm.bjcj.utils.AlgorithmUtils;
+import cn.lovezsm.bjcj.utils.AlgorithmUtil;
 import cn.lovezsm.bjcj.utils.FileUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
@@ -13,12 +13,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CommonTests {
@@ -33,12 +31,12 @@ public class CommonTests {
         GridMap gridMap = GridMap.buildByFile(new File("C:\\data\\grid.txt"),"测试晶格");
         System.out.println(gridMap);
     }
-    @Test
-    public void testFingerPrint(){
-        FingerPrintBuilder fingerPrintBuilder = new FingerPrintBuilderByFile("测试指纹库",new File("C:\\data\\Fingerprint_avg.dat"),new File("C:\\data\\Fingerprint_std.dat"),6);
-        FingerPrint finger = fingerPrintBuilder.build(true);
-        System.out.println(finger);
-    }
+//    @Test
+//    public void testFingerPrint(){
+//        FingerPrintBuilder fingerPrintBuilder = new FingerPrintBuilderByFile("测试指纹库",new File("C:\\data\\Fingerprint_avg.dat"),new File("C:\\data\\Fingerprint_std.dat"),6);
+//        FingerPrint finger = fingerPrintBuilder.build(true);
+//        System.out.println(finger);
+//    }
 
     @Test
     public void test1(){
@@ -139,11 +137,11 @@ public class CommonTests {
     @Test
     public void testMath(){
 //        Double[] vals = new Double[]{1d, 2d, 3d, 6d, 3d};
-//        AlgorithmUtils.VectorStandardization(vals);
+//        AlgorithmUtil.VectorStandardization(vals);
 //        System.out.println(Arrays.toString(vals));
-//        System.out.println(AlgorithmUtils.getVectorAvgVal(vals));
-//        System.out.println(AlgorithmUtils.getVectorScalingVal(vals));
-        System.out.println(AlgorithmUtils.getVectorScalingVal(new Double[]{10.61357945523998, 8.633434034486251, 9.097353818777124, 7.637703765764377, 8.97288753518689, 10.285441071229362}));
+//        System.out.println(AlgorithmUtil.getVectorAvgVal(vals));
+//        System.out.println(AlgorithmUtil.getVectorScalingVal(vals));
+        System.out.println(AlgorithmUtil.getVectorScalingVal(new Double[]{10.61357945523998, 8.633434034486251, 9.097353818777124, 7.637703765764377, 8.97288753518689, 10.285441071229362}));
     }
     @Test
     public void testClass(){
@@ -153,5 +151,11 @@ public class CommonTests {
     @Test
     public void testFormat(){
         System.out.println(String.format("(%s,%d,'%s','%s',%d,%d,%d),","1553679616395",2,"70476002a30d","8844771b6789",125,42,-85));
+    }
+    @Test
+    public void testDouble(){
+        Double d1 = null;
+        Double d2 = 1d;
+        System.out.println(d1+d2);
     }
 }

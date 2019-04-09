@@ -13,15 +13,17 @@ import org.springframework.stereotype.Component;
 @Data
 public class FingerPrint {
     private String name;
-    public Double[][] avg;
-    public Double[][] std;
+    private Double[][] avg;
+    private Double[][] std;
+    private boolean isStandardization;
 
     public FingerPrint() {
     }
 
-    public FingerPrint(String name, Double[][] avg, Double[][] std) {
+    public FingerPrint(String name, Double[][] avg, Double[][] std,boolean isStandardization) {
         this.name = name;
         this.avg = avg;
         this.std = std;
+        this.isStandardization = isStandardization;
     }
 }

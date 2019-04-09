@@ -13,57 +13,59 @@ spring:
 udp:
   port: 16662
   open: false
-
-algorithm:
-  sliding_window_time: 180
-  sliding_step_time: 10
-  k: 6
-
 log:
-  grid_id: 125
+  grid_id: -1
   raw_path: ${log.dicPath}/rows_${log.grid_id}.log
   loc_result_path: ${log.dicPath}/locresult_${log.grid_id}.log
   record_path: ${log.dicPath}/record_${log.grid_id}.log
   dicPath: C:/log/3-26-${random.int}
-  open: false
+  open: true
+  x: 33.5d
+  y: 13.3d
+default:
+  algorithmConf:
+    sliding_window_time: 180
+    sliding_step_time: 10
+    k: 6
+    not_null_val_min_count: 2
+  apConf:
+    info:
+      - mac: 70476002a30b
+        x: 35
+        y: 6.3
+      - mac: 70476002a30c
+        x: 39
+        y: 9.3
+      - mac: 70476002a30d
+        x: 33
+        y: 16.3
+      - mac: 70476002a30e
+        x: 17
+        y: 14.3
+      - mac: 70476002a30f
+        x: 22
+        y: 19.3
+      - mac: 70476002a30a
+        x: 27
+        y: 13.8
 
-ap:
-  info:
-    - mac: 70476002A30B
-      x: 35
-      y: 6.3
-    - mac: 70476002A30C
-      x: 39
-      y: 9.3
-    - mac: 70476002A30D
-      x: 33
-      y: 16.3
-    - mac: 70476002A30E
-      x: 17
-      y: 14.3
-    - mac: 70476002A30F
-      x: 22
-      y: 19.3
-    - mac: 70476002A30A
-      x: 27
-      y: 13.8
-
-message:
-  type:
-    00: direct-wifi
-    01: direct-ap
-    02: ssid
-    03: wifi-rssi
-    04: wifi-csi
-    05: indirect-wifi
-    06: indirect-ap
-  rssi-min: -110
-  mac-allow:
-#    - 240995b2909c
-    - 8844771b6789
-#    - 34d712a2e3dc
-#    - b8bc1bdbeadd
-  mac-refuse:
+  messageConf:
+    type:
+      00: direct-wifi
+      01: direct-ap
+      02: ssid
+      03: wifi-rssi
+      04: wifi-csi
+      05: indirect-wifi
+      06: indirect-ap
+    rssi-min: -110
+    mac-allow:
+        - 240995b2909c #旧荣耀
+        - 8844771b6789 #华为mate9
+#        - 34d712a2e3dc #锤子
+        - b8bc1bdbeadd  #huawei p8
+#        - 708a096219a1 #徐磊
+    mac-refuse:
 
 fingerprint:
   avg_path: C:/data/Fingerprint_avg.dat
@@ -420,3 +422,5 @@ fingerprint:
     - 348-15-20-1-1-1
     - 349-40-20-1-1-1
     - 350-41-20-1-1-1
+
+

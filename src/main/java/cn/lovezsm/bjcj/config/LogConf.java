@@ -13,13 +13,19 @@ import org.springframework.stereotype.Component;
 @Scope("singleton")
 @ConfigurationProperties("log")
 public class LogConf{
-
     private String rawPath;
     private String locResultPath;
     private String recordPath;
     private String dicPath;
     private boolean isOpen;
     private int gridId;
+    private double x;
+    private double y;
+
+
+    public String getLogPath() {
+        return "_"+getGridId()+"_"+getX()+"_"+getY()+"_";
+    }
 
     public String getRawPath() {
         return rawPath;
@@ -68,4 +74,22 @@ public class LogConf{
     public void setGridId(int gridId) {
         this.gridId = gridId;
     }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+
 }

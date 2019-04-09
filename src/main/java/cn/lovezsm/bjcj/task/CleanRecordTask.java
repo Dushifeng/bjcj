@@ -1,6 +1,6 @@
 package cn.lovezsm.bjcj.task;
 
-import cn.lovezsm.bjcj.utils.DataUtils;
+import cn.lovezsm.bjcj.utils.DataUtil;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CleanRecordTask extends QuartzJobBean {
     @Autowired
-    DataUtils dataUtils;
+    DataUtil dataUtil;
 
     private int time;
 
@@ -19,6 +19,6 @@ public class CleanRecordTask extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
         time = dataMap.getInt("time");
-        dataUtils.clearUpRecord(System.currentTimeMillis() - time * 1000);
+        dataUtil.clearUpRecord(System.currentTimeMillis() - time * 1000);
     }
 }

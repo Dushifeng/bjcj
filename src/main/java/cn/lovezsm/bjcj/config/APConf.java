@@ -14,50 +14,16 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 
-@Component
-@ConfigurationProperties(prefix = "ap")
-@Scope("singleton")
+@Document
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class APConf {
     private List<AP> info;
-    int apnum;
 
     public int getApnum() {
-        return apnum;
+        return info.size();
     }
-
-
-    @PostConstruct
-    public void init(){
-        for(int i=0;i<info.size();i++){
-            AP ap = info.get(i);
-            ap.setMac(ap.getMac().toLowerCase());
-            ap.setId(i);
-        }
-        apnum = info.size();
-
-    }
-
-    public void setApnum(int apnum) {
-        this.apnum = apnum;
-    }
-
-    public List<AP> getInfo() {
-        return info;
-    }
-
-    public void setInfo(List<AP> info) {
-        this.info = info;
-    }
-
-    public int getApId(String apMac) {
-        for(AP ap:info){
-            if (ap.getMac().equals(apMac)){
-                return ap.getId();
-            }
-        }
-        return -1;
-    }
-
     public boolean containMac(String apMac){
         for (AP ap:info){
             if(ap.getMac().equals(apMac.toLowerCase())){
@@ -65,5 +31,14 @@ public class APConf {
             }
         }
         return false;
+    }
+
+    public int getApId(String apMac){
+        for(int i=0;i<info.size();i++){
+            if(info.get(i).getMac().equals(apMac)){
+                return i;
+            }
+        }
+        return -1;
     }
 }

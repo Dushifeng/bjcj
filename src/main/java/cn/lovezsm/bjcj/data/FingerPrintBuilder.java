@@ -1,11 +1,11 @@
 package cn.lovezsm.bjcj.data;
 
 
-import cn.lovezsm.bjcj.utils.AlgorithmUtils;
+import cn.lovezsm.bjcj.utils.AlgorithmUtil;
 
 public abstract class FingerPrintBuilder {
 
-    public abstract FingerPrint build(boolean isStandardization);
+    public abstract FingerPrint build(String name,boolean isStandardization);
 
     public void standardStdMatrix(Double[][] std, int ln, double scalingVal) {
         Double[] vals = std[ln];
@@ -17,7 +17,7 @@ public abstract class FingerPrintBuilder {
     }
 
     public double standardAvgMatrix(Double[][] avg, int ln) {
-        double avgVal = AlgorithmUtils.getVectorAvgVal(avg[ln]);
+        double avgVal = AlgorithmUtil.getVectorAvgVal(avg[ln]);
         double sum = 0d;
         int i = 0;
         for(Double f:avg[ln]){
@@ -31,7 +31,7 @@ public abstract class FingerPrintBuilder {
         }
         double scalingVal = Math.sqrt(sum/i);
 
-        AlgorithmUtils.VectorStandardization(avg[ln]);
+        AlgorithmUtil.VectorStandardization(avg[ln]);
 
         return scalingVal;
     }

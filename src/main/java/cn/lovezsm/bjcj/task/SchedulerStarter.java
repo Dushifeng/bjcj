@@ -2,9 +2,9 @@ package cn.lovezsm.bjcj.task;
 
 import cn.lovezsm.bjcj.config.APConf;
 import cn.lovezsm.bjcj.config.AlgorithmConf;
+import cn.lovezsm.bjcj.config.GlobeConf;
 import cn.lovezsm.bjcj.data.FingerPrint;
-import cn.lovezsm.bjcj.netty.UDPServer;
-import cn.lovezsm.bjcj.utils.DataUtils;
+import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.utils.LogUtil;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 @Component
-@Order(2)
+@Order(3)
 public class SchedulerStarter implements CommandLineRunner {
 
     @Autowired
@@ -30,22 +30,21 @@ public class SchedulerStarter implements CommandLineRunner {
     NettyTask nettyTask;
 
     @Autowired
-    DataUtils dataUtils;
-    @Autowired
-    APConf apConf;
+    DataUtil dataUtil;
+
     @Autowired
     LogUtil logUtil;
+
     @Autowired
-    AlgorithmConf algorithmConf;
-    @Autowired
-    FingerPrint fingerPrint;
+    GlobeConf globeConf;
+
     @Override
     public void run(String... args) throws Exception {
         scheduler.start();
 
         JobDataMap jobDataMapProcessRawDataTask = new JobDataMap();
-        jobDataMapProcessRawDataTask.put("dataUtils",dataUtils);
-        jobDataMapProcessRawDataTask.put("apConf",apConf);
+        jobDataMapProcessRawDataTask.put("dataUtils", dataUtil);
+        jobDataMapProcessRawDataTask.put("apConf",globeConf.getApConf());
         jobDataMapProcessRawDataTask.put("logUtil",logUtil);
         Trigger triggerProcessRawDataTask = newTrigger()
                 .withIdentity("ProcessRawDataTask")
@@ -58,17 +57,18 @@ public class SchedulerStarter implements CommandLineRunner {
       scheduler.scheduleJob(newJob(ProcessRawDataTask.class).withIdentity("ProcessRawDataTask").build(), triggerProcessRawDataTask);
 
         JobDataMap jobDataMapLocationTask = new JobDataMap();
-        jobDataMapLocationTask.put("apNum",apConf.getApnum());
-        jobDataMapLocationTask.put("K",algorithmConf.getK());
-        jobDataMapLocationTask.put("fingerPrint",fingerPrint);
-        jobDataMapLocationTask.put("dataUtils",dataUtils);
-        jobDataMapLocationTask.put("stepTime",algorithmConf.getSliding_step_time());
+        jobDataMapLocationTask.put("apNum",globeConf.getApConf().getApnum());
+        jobDataMapLocationTask.put("algorithmConf",globeConf.getAlgorithmConf());
+        jobDataMapLocationTask.put("fingerPrints",globeConf.getFingerPrints());
+        jobDataMapLocationTask.put("dataUtils", dataUtil);
+        jobDataMapLocationTask.put("gridMap",globeConf.getGridMap());
+        jobDataMapLocationTask.put("log",logUtil);
         Trigger triggerLocationTask = newTrigger()
                 .withIdentity("LocationTask")
-                .startAt(futureDate(algorithmConf.getSliding_step_time(), DateBuilder.IntervalUnit.SECOND))
+                .startAt(futureDate(globeConf.getAlgorithmConf().getSliding_step_time(), DateBuilder.IntervalUnit.SECOND))
                 .usingJobData(jobDataMapLocationTask)
                 .withSchedule(simpleSchedule()
-                        .withIntervalInSeconds(algorithmConf.getSliding_step_time())
+                        .withIntervalInSeconds(globeConf.getAlgorithmConf().getSliding_step_time())
                         .repeatForever())
                 .build();
         scheduler.scheduleJob(newJob(LocationTask.class).withIdentity("LocationTask").build(), triggerLocationTask);

@@ -1,6 +1,5 @@
 package cn.lovezsm.bjcj.data;
 
-import cn.lovezsm.bjcj.utils.AlgorithmUtils;
 import cn.lovezsm.bjcj.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,12 +8,12 @@ import java.io.*;
 import java.util.Scanner;
 
 public class FingerPrintBuilderByFile extends FingerPrintBuilder{
-   private String name;
+
    private File avgFile;
    private File stdFile;
    private int apNum;
     @Override
-    public FingerPrint build(boolean isStandardization) {
+    public FingerPrint build(String name,boolean isStandardization) {
         Logger logger = LoggerFactory.getLogger(this.getClass());
         logger.info("开始建立指纹库");
 
@@ -41,7 +40,7 @@ public class FingerPrintBuilderByFile extends FingerPrintBuilder{
                 }
             }
 
-            fingerPrint = new FingerPrint(name,avg,std);
+            fingerPrint = new FingerPrint(name,avg,std,isStandardization);
             logger.info("指纹库创建成功");
 
         } catch (FileNotFoundException e) {
@@ -52,8 +51,7 @@ public class FingerPrintBuilderByFile extends FingerPrintBuilder{
         return fingerPrint;
     }
 
-    public FingerPrintBuilderByFile(String name, File avgFile, File stdFile, int apNum) {
-        this.name = name;
+    public FingerPrintBuilderByFile(File avgFile, File stdFile, int apNum) {
         this.avgFile = avgFile;
         this.stdFile = stdFile;
         this.apNum = apNum;

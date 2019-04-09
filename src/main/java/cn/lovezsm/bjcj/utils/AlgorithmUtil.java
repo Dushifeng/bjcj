@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 
-public class AlgorithmUtils {
+public class AlgorithmUtil {
 
     public static double culConfidence(LocalizeReturnVal record,double[] posX,double[] posY){
         double distance = 0f;

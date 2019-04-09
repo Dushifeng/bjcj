@@ -17,14 +17,7 @@ import java.util.List;
 @Controller
 public class ConfController {
 
-    @Autowired
-    APConf apConf;
 
-    @Autowired
-    AlgorithmConf algorithmConf;
-
-    @Autowired
-    MessageConf messageConf;
 
 //    private static String SUCCESS = "success";
 //    @ResponseBody
