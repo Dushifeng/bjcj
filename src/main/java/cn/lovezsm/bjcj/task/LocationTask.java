@@ -43,6 +43,8 @@ public class LocationTask extends QuartzJobBean {
         FingerPrint fingerPrint_2G = fingerPrints.get(0);
         System.out.println(fingerPrint_2G.getName());
         FingerPrint fingerPrint_5G = fingerPrints.get(1);
+
+
         for(Record record:records){
             String key = record.getDevMac()+"_"+record.getFrequency();
             if(valueMap.containsKey(key)){
@@ -61,9 +63,10 @@ public class LocationTask extends QuartzJobBean {
                     if(record.getRssi()[i]!=null){
                         doubles[i]=record.getRssi()[i];
                         integers[i] = 1;
+                    }else {
+                        doubles[i]=0d;
+                        integers[i] = 0;
                     }
-                    doubles[i]=0d;
-                    integers[i] = 0;
                 }
                 valueMap.put(key,doubles);
                 countMap.put(key,integers);
@@ -95,8 +98,19 @@ public class LocationTask extends QuartzJobBean {
             }else {
                 val = LocalizeByFingerPrint.doCalculate(doubles, k, fingerPrint_5G, gridMap);
             }
+            long time = System.currentTimeMillis();
+            val.setFrequency(frequency);
+            val.setUpdateTime(time);
             double error = -1d;
             String content="";
+            Object[] pro = val.getProbCandidate().toArray();
+            for (int i =0;i<pro.length;i++){
+                if(Double.isNaN((Double)pro[i])||Double.isInfinite((Double)pro[i])){
+                    System.out.println("error");
+                }
+                pro[i] = new BigDecimal((Double) pro[i]).setScale(2, RoundingMode.UP).doubleValue();
+            }
+
             if(logUtil.getLogConf().getX()!=-1d&&logUtil.getLogConf().getY()!=-1d){
                 error = AlgorithmUtil.euclideanDistance(val.getX(), val.getY(), logUtil.getLogConf().getX(),logUtil.getLogConf().getY());
                 if(Double.isNaN(error)||Double.isInfinite(error)){
@@ -105,8 +119,19 @@ public class LocationTask extends QuartzJobBean {
                     error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
                 }
                 error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
-                content =   System.currentTimeMillis() + ","+ devMac+ ","+ frequency + ","+ new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(val.getProbCandidate().toArray()) + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getX()-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getY()-val.getY())).setScale(2, RoundingMode.UP).doubleValue()+ ","+ error;
 
+                if(error>7){
+                    System.out.println("exception...");
+                    StringBuffer sb = new StringBuffer();
+                    for (Record record:records){
+                        if(record.getDevMac().equals(devMac)){
+                            sb.append(record.getFrequency()+";");
+                            sb.append(Arrays.toString(record.getRssi()));
+                        }
+                    }
+                    logUtil.log(time+","+devMac+","+error+","+val.getX()+","+val.getY()+","+sb.toString()+","+Arrays.toString(doubles),"exceptionData.log");
+                }
+                content =   time + ","+ devMac+ ","+ frequency + ","+ new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(pro) + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getX()-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getY()-val.getY())).setScale(2, RoundingMode.UP).doubleValue()+ ","+ error;
             }else if(logUtil.getLogConf().getGridId()!=-1){
                 int id = logUtil.getLogConf().getGridId()-1;
                 double grid_x = gridMap.getPosX()[id];
@@ -117,7 +142,7 @@ public class LocationTask extends QuartzJobBean {
                 }else {
                     error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
                 }
-                content =  System.currentTimeMillis() + ","+ devMac+ ","+ frequency + ","+ new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(val.getProbCandidate().toArray()) + ","+ new BigDecimal(Math.abs(grid_x-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(grid_y-val.getY())).setScale(2, RoundingMode.UP).doubleValue() + ","+ error;
+                content =  time + ","+ devMac+ ","+ frequency + ","+ new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(pro) + ","+ new BigDecimal(Math.abs(grid_x-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(grid_y-val.getY())).setScale(2, RoundingMode.UP).doubleValue() + ","+ error;
             }
             //locx,locy,
             logUtil.log(content,devMac+logUtil.getLogConf().getLogPath()+"local.log");
@@ -192,7 +217,7 @@ public class LocationTask extends QuartzJobBean {
     private int checkNotNullValCount(Double[] doubles) {
         int count=0;
         for (Double d:doubles){
-            if(d!=null){
+            if(d!=-100){
                 count++;
             }
         }

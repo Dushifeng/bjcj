@@ -102,14 +102,37 @@ public class DataUtil {
 
     public List<LocalizeReturnVal> getLocVal(){
         List<LocalizeReturnVal> ans = new ArrayList();
-        ans.addAll(returnVals);
+        Map<String,LocalizeReturnVal> map = new HashMap<>();
+        for(LocalizeReturnVal returnVal:returnVals){
+            if(!map.containsKey(returnVal.getDevMac())){
+                map.put(returnVal.getDevMac(),returnVal);
+            }else {
+                LocalizeReturnVal val = map.get(returnVal.getDevMac());
+                if(val.getFrequency()==2){
+                    val.setX(val.getX()*0.6+returnVal.getX()*0.4);
+                    val.setY(val.getY()*0.6+returnVal.getY()*0.4);
+                }else {
+                    val.setX(val.getX()*0.4+returnVal.getX()*0.6);
+                    val.setY(val.getY()*0.4+returnVal.getY()*0.6);
+                }
+            }
+        }
+
+        ans.addAll(map.values());
+
         return ans;
     }
 
-    public void updateLocVal(LocalizeReturnVal localizeReturnVal){
+    public synchronized void updateLocVal(LocalizeReturnVal localizeReturnVal){
+        if(returnVals.isEmpty()){
+            returnVals.add(localizeReturnVal);
+            return;
+        }
         for (LocalizeReturnVal item:returnVals){
             if(item.getDevMac().equals(localizeReturnVal.getDevMac())){
-                returnVals.remove(item);
+                if(item.getFrequency()==localizeReturnVal.getFrequency()){
+                    returnVals.remove(item);
+                }
             }
         }
         returnVals.add(localizeReturnVal);
@@ -138,6 +161,39 @@ public class DataUtil {
         List<Record> ans = new ArrayList<>();
         ans.addAll(recordqueue);
         return ans;
+    }
+    public void clearUpMessage(Long time){
+        if(dataqueue.size()==0){
+            return;
+        }
+        if(time==null){
+            dataqueue.clear();
+            return;
+        }
+        while (!dataqueue.isEmpty()){
+            Message cur = dataqueue.peek();
+            if(cur.getTime()>time){
+                return;
+            }
+            dataqueue.poll();
+        }
+    }
+
+    public void clearUpLocVal(Long time){
+        if(returnVals.size()==0){
+            return;
+        }
+        if(time==null){
+            returnVals.clear();
+            return;
+        }
+        while (!returnVals.isEmpty()){
+            LocalizeReturnVal cur = returnVals.peek();
+            if(cur.getUpdateTime()>time){
+                return;
+            }
+            returnVals.poll();
+        }
     }
 
     public void clearUpRecord(Long time){

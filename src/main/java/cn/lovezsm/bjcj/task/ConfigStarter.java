@@ -9,7 +9,7 @@ import cn.lovezsm.bjcj.data.FingerPrintBuilder;
 import cn.lovezsm.bjcj.data.FingerPrintBuilderByFile;
 import cn.lovezsm.bjcj.data.GridMap;
 import cn.lovezsm.bjcj.utils.SpringUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -27,17 +27,22 @@ public class ConfigStarter implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String avgPath_2G = "C:\\data\\Fingerprint_avg_2GHZ.dat";
         String stdPath_2G = "C:\\data\\Fingerprint_std_2GHZ.dat";
+        String avgPath_5G = "C:\\data\\Fingerprint_avg_5G.dat";
+        String stdPath_5G = "C:\\data\\Fingerprint_std_5G.dat";
         String gridPath = "C:\\data\\grid.txt";
-        FingerPrintBuilder fingerPrintBuilder = new FingerPrintBuilderByFile(new File(avgPath_2G),new File(stdPath_2G),6);
-        FingerPrint fingerprint2G = fingerPrintBuilder.build("2G",false);
-        FingerPrint fingerPrint5G = fingerPrintBuilder.build("5G",true);
+        FingerPrintBuilder fingerPrintBuilder_2G = new FingerPrintBuilderByFile(new File(avgPath_2G),new File(stdPath_2G),6);
+        FingerPrintBuilder fingerPrintBuilder_5G = new FingerPrintBuilderByFile(new File(avgPath_5G),new File(stdPath_5G),6);
+
+        FingerPrint fingerprint2G = fingerPrintBuilder_2G.build("2G",false);
+//        FingerPrint fingerPrint5G = fingerPrintBuilder_5G.build("5G",false);
+        FingerPrint fingerPrint5G = fingerPrintBuilder_2G.build("5G",true);
         GlobeConf globeConf = SpringUtil.getBean(GlobeConf.class);
         List<FingerPrint> fingerPrints = new ArrayList<>();
         fingerPrints.add(fingerprint2G);
         fingerPrints.add(fingerPrint5G);
         globeConf.setFingerPrints(fingerPrints);
 
-        GridMap gridMap = GridMap.buildByFile(new File(gridPath),"北京城建");
+        GridMap gridMap = GridMap.buildByFile(new File(gridPath),"深圳办公室");
         globeConf.setGridMap(gridMap);
         System.out.println("启动配置项启动器....");
     }

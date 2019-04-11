@@ -1,11 +1,13 @@
 package cn.lovezsm.bjcj.utils;
 
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
+import cn.lovezsm.bjcj.entity.Record;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class AlgorithmUtil {
 
@@ -121,4 +123,7 @@ public class AlgorithmUtil {
         }
         return ans;
     }
+
+
+
 }

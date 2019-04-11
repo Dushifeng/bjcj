@@ -14,6 +14,15 @@ public class LocalizeReturnVal implements Serializable {
     private Long updateTime;
     private String devMac;
 
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
+
+    private int frequency;
     public Long getUpdateTime() {
         return updateTime;
     }
@@ -49,9 +58,9 @@ public class LocalizeReturnVal implements Serializable {
     }
 
     public List<Double> getProbCandidate() {
-        for (int i =0;i<probCandidate.size();i++){
-            probCandidate.set(i,new BigDecimal(probCandidate.get(i)).setScale(2, RoundingMode.UP).doubleValue());
-        }
+//        for (int i =0;i<probCandidate.size();i++){
+//            probCandidate.set(i,new BigDecimal(probCandidate.get(i)).setScale(2, RoundingMode.UP).doubleValue());
+//        }
 
         return probCandidate;
     }

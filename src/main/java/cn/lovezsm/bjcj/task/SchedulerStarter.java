@@ -73,5 +73,20 @@ public class SchedulerStarter implements CommandLineRunner {
                 .build();
         scheduler.scheduleJob(newJob(LocationTask.class).withIdentity("LocationTask").build(), triggerLocationTask);
 
+
+
+        JobDataMap jobDataMapCleanUpTask = new JobDataMap();
+        jobDataMapCleanUpTask.put("time",globeConf.getAlgorithmConf().getSliding_window_time());
+        jobDataMapCleanUpTask.put("dataUtil", dataUtil);
+        Trigger triggerCleanUpTask = newTrigger()
+                .withIdentity("CleanUp")
+                .startAt(futureDate(globeConf.getAlgorithmConf().getSliding_window_time(), DateBuilder.IntervalUnit.SECOND))
+                .usingJobData(jobDataMapCleanUpTask)
+                .withSchedule(simpleSchedule()
+                        .withIntervalInSeconds(1)
+                        .repeatForever())
+                .build();
+        scheduler.scheduleJob(newJob(CleanRecordTask.class).withIdentity("CleanUpTask").build(), triggerCleanUpTask);
+
     }
 }

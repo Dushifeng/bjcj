@@ -16,6 +16,49 @@
             </ul>
         </div>
     </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-3">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Mac</span>
+                    </div>
+                    <input class="form-control" id="macInput">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">X</span>
+                    </div>
+                    <input class="form-control" id="xInput">
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Y</span>
+                    </div>
+                    <input class="form-control" id="yInput">
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">误差</span>
+                    </div>
+                    <input class="form-control" id="errorInt">
+                </div>
+            </div>
+            <div class="col-2">
+                <button class="btn btn-primary" id="showError">查询</button>
+                <button class="btn btn-primary" id="clearBtn">清空</button>
+            </div>
+        </div>
+
+    </div>
+
     <div class="container">
         <div class="bootstrap-table">
             <div class="fixed-table-container" style="padding-bottom: 0px;">
@@ -41,6 +84,12 @@
 <script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/bootstrap-table.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/locale/bootstrap-table-zh-CN.min.js"></script>
 <script>
+
+    var showInfo={
+        mac:'',
+        x:'',
+        y:''
+    }
     $(function () {
         buildMap();
         // buildTable();
@@ -49,7 +98,18 @@
         //setInterval(getHeatMapData,5000);
         
     })
-    
+
+    $("#clearBtn").click(function () {
+        showInfo['mac']= ""
+        showInfo['x'] = ""
+        showInfo['y'] = ""
+    })
+    $("#showError").click(function () {
+        showInfo['mac']= $("#macInput").val()
+        showInfo['x'] = $("#xInput").val()
+        showInfo['y'] = $("#yInput").val()
+    })
+
     function buildTable() {
         $('#table').bootstrapTable({
             queryParams: "queryParams",
@@ -124,8 +184,11 @@
         var cxt=c.getContext("2d");
 
         cxt.rect(640,496,712,304);
-        cxt.rect(1352,235.2,236,564.8)
-
+        cxt.font = 'bold 35px Arial';
+        cxt.textAlign = 'center';
+        cxt.textBaseline = 'bottom';
+        cxt.fillStyle = '#ccc';
+        cxt.strokeText("办公区域",996,680);
         cxt.stroke();
 
         //过道
@@ -133,16 +196,21 @@
         cxt.moveTo(122.4,160)
         cxt.lineTo(122.4,496)
         cxt.lineTo(1352,496)
-        cxt.lineTo(1352,235.2)
-        cxt.lineTo(1588,235.2)
+        cxt.lineTo(1352,210.2)
+        cxt.lineTo(1588,210.2)
         cxt.lineTo(1588,145.2)
-        cxt.lineTo(1249.2,145.2)
-        cxt.lineTo(1249.2,420)
+        cxt.lineTo(1288,145.2)
+        cxt.lineTo(1288,420)
         cxt.lineTo(242.4,420)
         cxt.lineTo(242.4,160)
         cxt.lineTo(122.4,160)
         cxt.closePath();
         cxt.stroke();
+        cxt.font = 'bold 35px Arial';
+        cxt.textAlign = 'center';
+        cxt.textBaseline = 'bottom';
+        cxt.fillStyle = '#ccc';
+        cxt.strokeText("过道",737,475);
 
         //仓库
         cxt.beginPath();
@@ -150,20 +218,56 @@
         cxt.closePath();
         cxt.stroke();
 
+        cxt.font = 'bold 35px Arial';
+        cxt.textAlign = 'center';
+        cxt.textBaseline = 'bottom';
+        cxt.fillStyle = '#ccc';
+        cxt.strokeText("仓库",381,648);
+
         cxt.beginPath();
         //办公室1
         cxt.rect(1151.2,633.6,200.8,166.4)
+        cxt.font = 'bold 35px Arial';
+        cxt.textAlign = 'center';
+        cxt.textBaseline = 'bottom';
+        cxt.fillStyle = '#ccc';
+        cxt.strokeText("办公室1",1251,716);
+
         //办公室2
         cxt.rect(1352,633.6,236,166.4)
+        cxt.font = 'bold 35px Arial';
+        cxt.textAlign = 'center';
+        cxt.textBaseline = 'bottom';
+        cxt.fillStyle = '#ccc';
+        cxt.strokeText("办公室2",1470,716);
+        cxt.closePath();
+        cxt.stroke();
+
+        cxt.rect(1352,210.2,236,184.8)
+        cxt.font = 'bold 35px Arial';
+        cxt.textAlign = 'center';
+        cxt.textBaseline = 'bottom';
+        cxt.fillStyle = '#ccc';
+        cxt.strokeText("会议室",1470,327);
         cxt.closePath();
         cxt.stroke();
 
         // cxt.fillStyle="rgba(142, 68, 173,0.3)";
         // cxt.beginPath();
-        // cxt.arc(40.999748022981414*40,4.093676593535858*40,10,0,Math.PI*2,true)
+        // cxt.arc(35*40,4.2*40,10,0,Math.PI*2,true)
         // cxt.closePath();
         // cxt.fill();
+        cxt.rect(1504,397.6,84,236)
+        cxt.font = 'bold 35px Arial';
+        cxt.textAlign = 'center';
+        cxt.textBaseline = 'bottom';
+        cxt.fillStyle = '#ccc';
+        cxt.strokeText("小仓库",1546,515.6);
+        cxt.closePath();
+        cxt.stroke();
     }
+
+
 
     function getAPLoc() {
         $.get("/getAPsInfo",function (aps) {
@@ -181,6 +285,7 @@
                 cxt.closePath();
                 cxt.fill();
 
+
             });
         })
     }
@@ -196,20 +301,31 @@
             buildMap();
             // getAPLoc()
             // $('#table').bootstrapTable('load',ans);
-            console.log(ans)
             $.each(ans,function(index,dev){
-                cxt.fillStyle=colorMap[dev.devMac];
+                cxt.fillStyle="#0066FF";
+                if(dev.devMac=='34d712a2e3dc'){
+                    cxt.fillStyle="#FF6600";
+                }
+
                 cxt.beginPath();
                 // cxt.arc(dev.x*40,dev.y*40,dev.confidence*10,0,Math.PI*2,true)
                 cxt.arc(dev.x*40,dev.y*40,15,0,Math.PI*2,true)
                 cxt.closePath();
                 cxt.fill();
 
+                cxt.fillStyle = '#ccc';
+                cxt.strokeText(dev.x.toFixed(2)+","+dev.y.toFixed(2), dev.x*40,  dev.y*40);
+
+
+                if(showInfo['mac']==dev.devMac){
+                    var errorVal = distance(showInfo['x'],showInfo['y'],dev.x,dev.y).toFixed(2)
+                    $("#errorInt").val(errorVal)
+                }
             });
     
         });
     }
-
+    const distance = (x0, y0, x1, y1) => Math.hypot(x1 - x0, y1 - y0);
     function getHeatMapData() {
         var points = [];
         var max = 0;

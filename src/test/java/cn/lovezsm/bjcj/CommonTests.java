@@ -16,6 +16,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -157,5 +159,9 @@ public class CommonTests {
         Double d1 = null;
         Double d2 = 1d;
         System.out.println(d1+d2);
+    }
+    @Test
+    public void testE1(){
+        System.out.println( new BigDecimal(0.9884710505995267d).setScale(2, RoundingMode.UP).doubleValue());
     }
 }

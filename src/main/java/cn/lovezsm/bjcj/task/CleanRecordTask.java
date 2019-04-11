@@ -10,15 +10,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CleanRecordTask extends QuartzJobBean {
-    @Autowired
-    DataUtil dataUtil;
 
     private int time;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
+
         time = dataMap.getInt("time");
-        dataUtil.clearUpRecord(System.currentTimeMillis() - time * 1000);
+        DataUtil dataUtil = (DataUtil) dataMap.get("dataUtil");
+        long t = System.currentTimeMillis() - (time+1) * 1000;
+        dataUtil.clearUpMessage(t);
+        dataUtil.clearUpRecord(t);
     }
 }
