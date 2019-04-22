@@ -1,11 +1,10 @@
 package cn.lovezsm.bjcj;
 
-import cn.lovezsm.bjcj.data.FingerPrint;
-import cn.lovezsm.bjcj.data.FingerPrintBuilder;
-import cn.lovezsm.bjcj.data.FingerPrintBuilderByFile;
-import cn.lovezsm.bjcj.data.GridMap;
+import cn.lovezsm.bjcj.data.*;
+import cn.lovezsm.bjcj.entity.Message;
 import cn.lovezsm.bjcj.entity.Record;
 import cn.lovezsm.bjcj.utils.AlgorithmUtil;
+import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.utils.FileUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelOption;
@@ -14,18 +13,21 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CommonTests {
 
     @Test
     public void testFileUtil() throws IOException {
-        System.out.println(FileUtil.getTotalLines(new File("C:\\data\\Fingerprint_avg.dat")));
+//        System.out.println(FileUtil.getTotalLines(new File("C:\\data\\Fingerprint_avg.dat")));
+        System.out.println(new Date());
     }
 
     @Test
@@ -164,4 +166,257 @@ public class CommonTests {
     public void testE1(){
         System.out.println( new BigDecimal(0.9884710505995267d).setScale(2, RoundingMode.UP).doubleValue());
     }
+
+    @Test
+    public void funcationCount() throws Exception{
+        String dic = "C:/log/3-26--1576840985/";
+        File ap1 = new File(dic+"70476002a30b.log");
+        File ap2 = new File(dic+"70476002a30c.log");
+        File ap3 = new File(dic+"70476002a30d.log");
+        File ap4 = new File(dic+"70476002a30e.log");
+        File ap5 = new File(dic+"70476002a30f.log");
+        File ap6 = new File(dic+"70476002a30a.log");
+        System.out.println("AP 1的条目数："+FileUtil.getTotalLines(ap1));
+        System.out.println("AP 2的条目数："+FileUtil.getTotalLines(ap2));
+        System.out.println("AP 3的条目数："+FileUtil.getTotalLines(ap3));
+        System.out.println("AP 4的条目数："+FileUtil.getTotalLines(ap4));
+        System.out.println("AP 5的条目数："+FileUtil.getTotalLines(ap5));
+        System.out.println("AP 6的条目数："+FileUtil.getTotalLines(ap6));
+
+        Map<String,Integer> counts = new HashMap<>();
+        counts.put("心跳包",0);
+        String line;
+        Date firstTime = null;
+        Date lastTime = null;
+        BufferedReader br_ap1 = new BufferedReader(new FileReader(ap1));
+        BufferedReader br_ap2 = new BufferedReader(new FileReader(ap2));
+        BufferedReader br_ap3 = new BufferedReader(new FileReader(ap3));
+        BufferedReader br_ap4 = new BufferedReader(new FileReader(ap4));
+        BufferedReader br_ap5 = new BufferedReader(new FileReader(ap5));
+        BufferedReader br_ap6 = new BufferedReader(new FileReader(ap6));
+
+
+        while ((line = br_ap1.readLine())!=null){
+            String[] split = line.split(":");
+            Date cur = new Date(Long.parseLong(split[0]));
+            if(firstTime==null||firstTime.getTime()>cur.getTime()){
+                firstTime = cur;
+            }
+            if(lastTime==null||lastTime.getTime()<cur.getTime()){
+                lastTime = cur;
+            }
+            line = split[1];
+            if(line.length()<=58){
+                counts.put("心跳包",counts.get("心跳包")+1);
+                continue;
+            }
+            List<Message> messages = this.analyzeData(line);
+            for (Message message:messages){
+                int frequency = message.getFrequency();
+                if (!counts.containsKey(frequency+"")){
+                    counts.put(frequency+"",0);
+                }
+                counts.put(frequency+"",counts.get(frequency+"")+1);
+            }
+        }
+        System.out.println("第一条记录时间："+firstTime);
+        System.out.println("最后一条记录时间:"+lastTime);
+        for (Map.Entry<String,Integer> entry:counts.entrySet()){
+            System.out.println(entry.getKey()+" : "+entry.getValue());
+        }
+
+        counts = new HashMap<>();
+        counts.put("心跳包",0);
+        firstTime = null;
+        lastTime = null;
+        while ((line = br_ap2.readLine())!=null){
+            String[] split = line.split(":");
+            Date cur = new Date(Long.parseLong(split[0]));
+            if(firstTime==null||firstTime.getTime()>cur.getTime()){
+                firstTime = cur;
+            }
+            if(lastTime==null||lastTime.getTime()<cur.getTime()){
+                lastTime = cur;
+            }
+            line = split[1];
+            if(line.length()<=58){
+                counts.put("心跳包",counts.get("心跳包")+1);
+                continue;
+            }
+            List<Message> messages = this.analyzeData(line);
+            for (Message message:messages){
+                int frequency = message.getFrequency();
+                if (!counts.containsKey(frequency+"")){
+                    counts.put(frequency+"",0);
+                }
+                counts.put(frequency+"",counts.get(frequency+"")+1);
+            }
+        }
+        System.out.println("第一条记录时间："+firstTime);
+        System.out.println("最后一条记录时间:"+lastTime);
+        for (Map.Entry<String,Integer> entry:counts.entrySet()){
+            System.out.println(entry.getKey()+" : "+entry.getValue());
+        }
+
+        counts = new HashMap<>();
+        counts.put("心跳包",0);
+        firstTime = null;
+        lastTime = null;
+        while ((line = br_ap3.readLine())!=null){
+            String[] split = line.split(":");
+            Date cur = new Date(Long.parseLong(split[0]));
+            if(firstTime==null||firstTime.getTime()>cur.getTime()){
+                firstTime = cur;
+            }
+            if(lastTime==null||lastTime.getTime()<cur.getTime()){
+                lastTime = cur;
+            }
+            line = split[1];
+            if(line.length()<=58){
+                counts.put("心跳包",counts.get("心跳包")+1);
+                continue;
+            }
+            List<Message> messages = this.analyzeData(line);
+            for (Message message:messages){
+                int frequency = message.getFrequency();
+                if (!counts.containsKey(frequency+"")){
+                    counts.put(frequency+"",0);
+                }
+                counts.put(frequency+"",counts.get(frequency+"")+1);
+            }
+        }
+        System.out.println("第一条记录时间："+firstTime);
+        System.out.println("最后一条记录时间:"+lastTime);
+        for (Map.Entry<String,Integer> entry:counts.entrySet()){
+            System.out.println(entry.getKey()+" : "+entry.getValue());
+        }
+        counts = new HashMap<>();
+        counts.put("心跳包",0);
+        firstTime = null;
+        lastTime = null;
+        while ((line = br_ap4.readLine())!=null){
+            String[] split = line.split(":");
+            Date cur = new Date(Long.parseLong(split[0]));
+            if(firstTime==null||firstTime.getTime()>cur.getTime()){
+                firstTime = cur;
+            }
+            if(lastTime==null||lastTime.getTime()<cur.getTime()){
+                lastTime = cur;
+            }
+            line = split[1];
+            if(line.length()<=58){
+                counts.put("心跳包",counts.get("心跳包")+1);
+                continue;
+            }
+            List<Message> messages = this.analyzeData(line);
+            for (Message message:messages){
+                int frequency = message.getFrequency();
+                if (!counts.containsKey(frequency+"")){
+                    counts.put(frequency+"",0);
+                }
+                counts.put(frequency+"",counts.get(frequency+"")+1);
+            }
+        }
+        System.out.println("第一条记录时间："+firstTime);
+        System.out.println("最后一条记录时间:"+lastTime);
+        for (Map.Entry<String,Integer> entry:counts.entrySet()){
+            System.out.println(entry.getKey()+" : "+entry.getValue());
+        }
+        counts = new HashMap<>();
+        counts.put("心跳包",0);
+        firstTime = null;
+        lastTime = null;
+        while ((line = br_ap5.readLine())!=null){
+            String[] split = line.split(":");
+            Date cur = new Date(Long.parseLong(split[0]));
+            if(firstTime==null||firstTime.getTime()>cur.getTime()){
+                firstTime = cur;
+            }
+            if(lastTime==null||lastTime.getTime()<cur.getTime()){
+                lastTime = cur;
+            }
+            line = split[1];
+            if(line.length()<=58){
+                counts.put("心跳包",counts.get("心跳包")+1);
+                continue;
+            }
+            List<Message> messages = this.analyzeData(line);
+            for (Message message:messages){
+                int frequency = message.getFrequency();
+                if (!counts.containsKey(frequency+"")){
+                    counts.put(frequency+"",0);
+                }
+                counts.put(frequency+"",counts.get(frequency+"")+1);
+            }
+        }
+        System.out.println("第一条记录时间："+firstTime);
+        System.out.println("最后一条记录时间:"+lastTime);
+        for (Map.Entry<String,Integer> entry:counts.entrySet()){
+            System.out.println(entry.getKey()+" : "+entry.getValue());
+        }
+        counts = new HashMap<>();
+        counts.put("心跳包",0);
+        firstTime = null;
+        lastTime = null;
+        while ((line = br_ap6.readLine())!=null){
+            String[] split = line.split(":");
+            Date cur = new Date(Long.parseLong(split[0]));
+            if(firstTime==null||firstTime.getTime()>cur.getTime()){
+                firstTime = cur;
+            }
+            if(lastTime==null||lastTime.getTime()<cur.getTime()){
+                lastTime = cur;
+            }
+            line = split[1];
+            if(line.length()<=58){
+                counts.put("心跳包",counts.get("心跳包")+1);
+                continue;
+            }
+            List<Message> messages = this.analyzeData(line);
+            for (Message message:messages){
+                int frequency = message.getFrequency();
+                if (!counts.containsKey(frequency+"")){
+                    counts.put(frequency+"",0);
+                }
+                counts.put(frequency+"",counts.get(frequency+"")+1);
+            }
+        }
+        System.out.println("第一条记录时间："+firstTime);
+        System.out.println("最后一条记录时间:"+lastTime);
+        for (Map.Entry<String,Integer> entry:counts.entrySet()){
+            System.out.println(entry.getKey()+" : "+entry.getValue());
+        }
+
+    }
+
+
+    public List<Message> analyzeData(String rawData){
+
+        Long scanTime=System.currentTimeMillis();
+        List<Message> messages = new ArrayList<>();
+        String apMac= rawData.substring(46, 58);
+        int messageIndex = 58;
+        while (messageIndex < rawData.length() - 1) {
+            String tag = rawData.substring(messageIndex, messageIndex + 2);
+            if (!tag.equals("00")) {
+                int len = Integer.parseInt(rawData.substring(messageIndex + 2, messageIndex + 6), 16);
+                messageIndex += (len * 2 + 6);
+//                System.out.println("出现了一条异常信息:"+tag);
+                continue;
+            }
+            messageIndex += 6;
+            String devMac = rawData.substring(messageIndex, messageIndex + 12);
+            int f = Integer.parseInt(rawData.substring(messageIndex + 16, messageIndex + 18), 16);
+            messageIndex += 32;
+            int rssiVal = Integer.parseInt(rawData.substring(messageIndex, messageIndex + 2), 16) - 256;
+            messageIndex += 2;
+            Message message = new Message(scanTime,tag, devMac, f, rssiVal, apMac);
+            messages.add(message);
+        }
+
+        return messages;
+
+    }
+
+
 }

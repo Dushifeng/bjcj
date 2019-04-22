@@ -68,8 +68,16 @@ public class DataUtil {
 //    }
 
 
- public List<Message> analyzeData(String rawData){
-        Long scanTime=System.currentTimeMillis();
+ public List<Message> analyzeData(String rawData,Long scanTime){
+        if(scanTime==null){
+            scanTime = System.currentTimeMillis();
+        }
+
+//        if (rawData.contains(":")){
+//            scanTime = Long.parseLong(rawData.split(":")[0]);
+//            rawData = rawData.split(":")[1];
+//        }
+
         List<Message> messages = new ArrayList<>();
         String apMac= rawData.substring(46, 58);
         int messageIndex = 58;

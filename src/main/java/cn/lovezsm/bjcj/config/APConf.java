@@ -25,8 +25,15 @@ public class APConf {
         return info.size();
     }
     public boolean containMac(String apMac){
+
+        String[] split = apMac.split(":");
+        StringBuffer mac = new StringBuffer();
+        for (String s:split){
+            mac.append(s.toLowerCase());
+        }
+        apMac = mac.toString();
         for (AP ap:info){
-            if(ap.getMac().equals(apMac.toLowerCase())){
+            if(ap.getMac().equals(apMac)){
                 return true;
             }
         }

@@ -42,11 +42,14 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             return;
         }
         String s = ByteBufUtil.hexDump(datagramPacket.content());
+//        System.out.println(s);
+        String apMac= s.substring(46, 58);
+//        logUtil.log(System.currentTimeMillis()+":"+s,apMac+".log");
         String str = this.filter(s);
-
+//
         if(str!=null){
 
-            List<Message> messages = dataUtil.analyzeData(str);
+            List<Message> messages = dataUtil.analyzeData(str,null);
             if(messages.size()>0){
 //                logUtil.logRaw(messages);
                 for(Message message:messages){

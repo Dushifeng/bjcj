@@ -11,8 +11,12 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+
 
 public class UDPServer{
+
+    public static Date startTime = new Date();
     private final int port;
     private Logger log = LoggerFactory.getLogger(this.getClass());
     public UDPServer(int port) {
@@ -21,6 +25,7 @@ public class UDPServer{
     public void start() throws Exception {
         final UDPServerHandler serverHandler = new UDPServerHandler();
         log.info("启动服务");
+
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();

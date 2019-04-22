@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class CollectionController {
     @GetMapping("/")
     public String index(){
-        System.out.println("come..");
         return "test1";
     }
 }

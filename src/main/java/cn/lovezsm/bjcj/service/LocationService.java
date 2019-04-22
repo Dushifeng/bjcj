@@ -2,19 +2,99 @@ package cn.lovezsm.bjcj.service;
 
 import cn.lovezsm.bjcj.algorithm.LocalizeByFingerPrint;
 
+import cn.lovezsm.bjcj.config.GlobeConf;
+import cn.lovezsm.bjcj.task.CleanRecordTask;
+import cn.lovezsm.bjcj.task.LocationTask;
+import cn.lovezsm.bjcj.task.NettyTask;
+import cn.lovezsm.bjcj.task.ProcessRawDataTask;
 import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.data.FingerPrint;
 
+import cn.lovezsm.bjcj.utils.LogUtil;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+
+import static org.quartz.DateBuilder.futureDate;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 
 @Service
+@Scope("singleton")
 public class LocationService {
     @Autowired
-    LocalizeByFingerPrint lbfp;
+    @Qualifier("Scheduler")
+    private Scheduler scheduler;
+    @Autowired
+    NettyTask nettyTask;
     @Autowired
     DataUtil dataUtil;
+    @Autowired
+    LogUtil logUtil;
+    @Autowired
+    GlobeConf globeConf;
+    JobDataMap jobDataMapProcessRawDataTask;
 
+    @PostConstruct
+    public void init(){
+
+    }
+
+    public synchronized void open() throws SchedulerException {
+
+
+        jobDataMapProcessRawDataTask = new JobDataMap();
+        jobDataMapProcessRawDataTask.put("dataUtils", dataUtil);
+        jobDataMapProcessRawDataTask.put("apConf",globeConf.getApConf());
+        jobDataMapProcessRawDataTask.put("logUtil",logUtil);
+        Trigger triggerProcessRawDataTask = newTrigger()
+                .withIdentity("ProcessRawDataTask")
+                .startAt(futureDate(1, DateBuilder.IntervalUnit.SECOND))
+                .usingJobData(jobDataMapProcessRawDataTask)
+                .withSchedule(simpleSchedule()
+                        .withIntervalInSeconds(1)
+                        .repeatForever())
+                .build();
+        scheduler.scheduleJob(newJob(ProcessRawDataTask.class).withIdentity("ProcessRawDataTask").build(), triggerProcessRawDataTask);
+
+        JobDataMap jobDataMapLocationTask = new JobDataMap();
+        jobDataMapLocationTask.put("apNum",globeConf.getApConf().getApnum());
+        jobDataMapLocationTask.put("algorithmConf",globeConf.getAlgorithmConf());
+        jobDataMapLocationTask.put("fingerPrints",globeConf.getFingerPrints());
+        jobDataMapLocationTask.put("dataUtils", dataUtil);
+        jobDataMapLocationTask.put("gridMap",globeConf.getGridMap());
+        jobDataMapLocationTask.put("log",logUtil);
+        Trigger triggerLocationTask = newTrigger()
+                .withIdentity("LocationTask")
+                .startAt(futureDate(globeConf.getAlgorithmConf().getSliding_step_time(), DateBuilder.IntervalUnit.SECOND))
+                .usingJobData(jobDataMapLocationTask)
+                .withSchedule(simpleSchedule()
+                        .withIntervalInSeconds(globeConf.getAlgorithmConf().getSliding_step_time())
+                        .repeatForever())
+                .build();
+        scheduler.scheduleJob(newJob(LocationTask.class).withIdentity("LocationTask").build(), triggerLocationTask);
+
+
+
+        JobDataMap jobDataMapCleanUpTask = new JobDataMap();
+        jobDataMapCleanUpTask.put("time",globeConf.getAlgorithmConf().getSliding_window_time());
+        jobDataMapCleanUpTask.put("dataUtil", dataUtil);
+        Trigger triggerCleanUpTask = newTrigger()
+                .withIdentity("CleanUp")
+                .startAt(futureDate(globeConf.getAlgorithmConf().getSliding_window_time(), DateBuilder.IntervalUnit.SECOND))
+                .usingJobData(jobDataMapCleanUpTask)
+                .withSchedule(simpleSchedule()
+                        .withIntervalInSeconds(1)
+                        .repeatForever())
+                .build();
+        scheduler.scheduleJob(newJob(CleanRecordTask.class).withIdentity("CleanUpTask").build(), triggerCleanUpTask);
+
+    }
 
 }

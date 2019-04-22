@@ -12,8 +12,6 @@ import java.util.List;
 
 @Controller
 public class MainController {
-
-
     @Autowired
     DataUtil dataUtil;
     @Autowired

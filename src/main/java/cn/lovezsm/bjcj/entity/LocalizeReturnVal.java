@@ -23,6 +23,7 @@ public class LocalizeReturnVal implements Serializable {
     }
 
     private int frequency;
+
     public Long getUpdateTime() {
         return updateTime;
     }
