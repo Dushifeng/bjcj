@@ -59,6 +59,8 @@ default:
     sliding_step_time: 10
     k: 6
     not_null_val_min_count: 2
+    offset_not_null_val: 6
+    offsetOpen: true
   apConf:
     info:
       - mac: 70476002a30b

@@ -78,6 +78,17 @@ public class AlgorithmUtil {
         return ans;
     }
 
+
+    public static int checkNotNullValCount(Double[] doubles) {
+        int count=0;
+        for (Double d:doubles){
+            if(d!=-100&&d!=null){
+                count++;
+            }
+        }
+        return count;
+    }
+
     public static void normalized(double[] fFusion) {
         double sum = 0;
         for (double a:fFusion){

@@ -1,5 +1,6 @@
 package cn.lovezsm.bjcj.task;
 
+import cn.lovezsm.bjcj.algorithm.CalculateOffset;
 import cn.lovezsm.bjcj.algorithm.LocalizeByFingerPrint;
 import cn.lovezsm.bjcj.config.AlgorithmConf;
 import cn.lovezsm.bjcj.data.FingerPrint;
@@ -24,6 +25,8 @@ import java.util.*;
 
 @Component
 public class LocationTask extends QuartzJobBean {
+
+
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -76,28 +79,54 @@ public class LocationTask extends QuartzJobBean {
         Iterator<String> keyIter = valueMap.keySet().iterator();
         while (keyIter.hasNext()){
             String key = keyIter.next();
-            Double[] doubles = valueMap.get(key);
+            Double[] rssi = valueMap.get(key);
             Integer[] integers = countMap.get(key);
             for(int i =0;i<apNum;i++){
                 if(integers[i]>0){
-                    doubles[i] = doubles[i]/integers[i];
+                    rssi[i] = rssi[i]/integers[i];
                 }else {
-                    doubles[i] = -100d;
+                    rssi[i] = -100d;
                 }
             }
-            int count = checkNotNullValCount(doubles);
-            if(count<algorithmConf.getNotNullValMinCount()){
-                continue;
-            }
-//            culMap.put(key,doubles);
             String devMac = key.split("_")[0];
             Integer frequency = Integer.parseInt(key.split("_")[1]);
             LocalizeReturnVal val;
-            if(frequency==2){
-                val = LocalizeByFingerPrint.doCalculate(doubles, k, fingerPrint_2G, gridMap);
-            }else {
-                val = LocalizeByFingerPrint.doCalculate(doubles, k, fingerPrint_5G, gridMap);
+            LocalizeByFingerPrint localizeByFingerPrint = LocalizeByFingerPrint.getInstance();
+
+            int count = AlgorithmUtil.checkNotNullValCount(rssi);
+            if(count<algorithmConf.getNotNullValMinCount()){
+                continue;
             }
+//            culMap.put(key,rssi);
+            FingerPrint fingerPrint = null;
+            if(frequency==2){
+                fingerPrint = fingerPrint_2G;
+            }else {
+                fingerPrint = fingerPrint_5G;
+            }
+            if(algorithmConf.isOffsetOpen()&&count>=algorithmConf.getOffsetNotNullVal()){
+                double offsetVal = CalculateOffset.doCalculate(rssi, k, fingerPrint, gridMap);
+                if(Math.abs(offsetVal)<12){
+                    if(dataUtil.containsKeyForOffsetMap(devMac)){
+                        double oldOffsetVal = dataUtil.getOffsetValByMac(devMac);
+                        dataUtil.updateOffsetMap(devMac,oldOffsetVal*0.7+offsetVal*0.3);
+                    }else {
+                        dataUtil.updateOffsetMap(devMac,offsetVal);
+                    }
+                }
+            }
+
+            if(dataUtil.containsKeyForOffsetMap(devMac)){
+                double offset = dataUtil.getOffsetValByMac(devMac);
+                for(int i=0;i<rssi.length;i++){
+                    if(rssi[i]!=null&&rssi[i]!=-100){
+                        rssi[i] = rssi[i]-offset;
+                    }
+                }
+            }
+
+            val = localizeByFingerPrint.doCalculate(rssi, k, fingerPrint, gridMap);
+
             long time = System.currentTimeMillis();
             val.setFrequency(frequency);
             val.setUpdateTime(time);
@@ -129,7 +158,7 @@ public class LocationTask extends QuartzJobBean {
                             sb.append(Arrays.toString(record.getRssi()));
                         }
                     }
-                    logUtil.log(time+","+devMac+","+error+","+val.getX()+","+val.getY()+","+sb.toString()+","+Arrays.toString(doubles),"exceptionData.log");
+                    logUtil.log(time+","+devMac+","+error+","+val.getX()+","+val.getY()+","+sb.toString()+","+Arrays.toString(rssi),"exceptionData.log");
                 }
                 content =   time + ","+ devMac+ ","+ frequency + ","+ new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(pro) + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getX()-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getY()-val.getY())).setScale(2, RoundingMode.UP).doubleValue()+ ","+ error;
             }else if(logUtil.getLogConf().getGridId()!=-1){
@@ -214,15 +243,6 @@ public class LocationTask extends QuartzJobBean {
 //            LogUtil.log(content,val.getDevMac()+"_"+logConf.gridId+"_"+"local.log");
         }
 
-    private int checkNotNullValCount(Double[] doubles) {
-        int count=0;
-        for (Double d:doubles){
-            if(d!=-100){
-                count++;
-            }
-        }
-        return count;
-    }
 //        Thread thread = new Thread(new Runnable() {
 //            @Override
 //            public void run() {

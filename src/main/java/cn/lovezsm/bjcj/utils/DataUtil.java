@@ -1,5 +1,6 @@
 package cn.lovezsm.bjcj.utils;
 
+import cn.lovezsm.bjcj.algorithm.LocalizeByFingerPrint;
 import cn.lovezsm.bjcj.data.DataFilter;
 import cn.lovezsm.bjcj.data.FingerPrint;
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
@@ -23,6 +25,8 @@ public class DataUtil {
     private BlockingQueue<Message> dataqueue = new LinkedBlockingQueue<Message>();
     private BlockingQueue<Record> recordqueue = new LinkedBlockingQueue<>();
     public BlockingQueue<LocalizeReturnVal> returnVals = new LinkedBlockingQueue<>();
+
+    private Map<String,Double> offsetMap = new ConcurrentHashMap<>();
 
     private final Logger log= LoggerFactory.getLogger(DataUtil.class);
 
@@ -66,6 +70,20 @@ public class DataUtil {
 //        return ans;
 //
 //    }
+
+
+ public boolean containsKeyForOffsetMap(String mac){
+     return offsetMap.containsKey(mac);
+ }
+ public double getOffsetValByMac(String mac){
+
+     return offsetMap.get(mac);
+ }
+
+ public void updateOffsetMap(String mac,Double offset){
+     offsetMap.put(mac,offset);
+ }
+
 
 
  public List<Message> analyzeData(String rawData,Long scanTime){
@@ -113,7 +131,8 @@ public class DataUtil {
         Map<String,LocalizeReturnVal> map = new HashMap<>();
         for(LocalizeReturnVal returnVal:returnVals){
             if(!map.containsKey(returnVal.getDevMac())){
-                map.put(returnVal.getDevMac(),returnVal);
+                LocalizeReturnVal t = returnVal.clone();
+                map.put(returnVal.getDevMac(),t);
             }else {
                 LocalizeReturnVal val = map.get(returnVal.getDevMac());
                 if(val.getFrequency()==2){

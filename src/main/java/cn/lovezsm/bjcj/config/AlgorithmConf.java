@@ -16,4 +16,6 @@ public class AlgorithmConf {
     private int sliding_window_time;
     private int sliding_step_time;
     private int notNullValMinCount;
+    private int offsetNotNullVal;
+    private boolean offsetOpen;
 }

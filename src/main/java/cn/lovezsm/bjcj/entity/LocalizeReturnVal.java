@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalizeReturnVal implements Serializable {
+public class LocalizeReturnVal implements Cloneable,Serializable {
     private double x;
     private double y;
     private List<Integer> idxCandidate = new ArrayList<>();
@@ -88,5 +88,15 @@ public class LocalizeReturnVal implements Serializable {
                 ", idxCandidate=" + idxCandidate +
                 ", probCandidate=" + probCandidate +
                 '}';
+    }
+
+    public LocalizeReturnVal clone() {
+        LocalizeReturnVal o = null;
+        try {
+            o = (LocalizeReturnVal) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return o;
     }
 }

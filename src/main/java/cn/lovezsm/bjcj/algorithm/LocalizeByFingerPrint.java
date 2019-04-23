@@ -34,10 +34,18 @@ import java.util.Arrays;
  */
 
 @Component
-@Scope("singleton")
 public class LocalizeByFingerPrint {
 
-    public static LocalizeReturnVal doCalculate(Double[] rssi, int k, FingerPrint fingerPrint, GridMap gridMap){
+    private static LocalizeByFingerPrint instance = new LocalizeByFingerPrint();
+
+    public static LocalizeByFingerPrint getInstance() {
+        return instance;
+    }
+
+    private LocalizeByFingerPrint() {
+    }
+
+    public LocalizeReturnVal doCalculate(Double[] rssi, int k, FingerPrint fingerPrint, GridMap gridMap){
 
         if(fingerPrint.isStandardization()){
             //标准化rssi
@@ -76,7 +84,6 @@ public class LocalizeByFingerPrint {
         for(int i=0;i<idxCandidate.length;i++){
             probCandidate[i] = fFusion[idxCandidate[i]];
         }
-
 
         returnVal.setProbCandidate(probCandidate);
 
