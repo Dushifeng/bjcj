@@ -6,11 +6,15 @@ import cn.lovezsm.bjcj.data.FingerPrint;
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
 import cn.lovezsm.bjcj.entity.Message;
 import cn.lovezsm.bjcj.entity.Record;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -26,68 +30,42 @@ public class DataUtil {
     private BlockingQueue<Record> recordqueue = new LinkedBlockingQueue<>();
     public BlockingQueue<LocalizeReturnVal> returnVals = new LinkedBlockingQueue<>();
 
-    private Map<String,Double> offsetMap = new ConcurrentHashMap<>();
+    private Map<String, Object> offsetMap = new ConcurrentHashMap<>();
 
-    private final Logger log= LoggerFactory.getLogger(DataUtil.class);
+    private final Logger log = LoggerFactory.getLogger(DataUtil.class);
 
 
     @Autowired
     DataFilter dataFilter;
 
-//    public FloorPlan<String,Object> analyzeData(String rawData){
-//        FloorPlan<String,Object> ans = new HashMap<>();
-//
-//        ans.put("companyName",rawData.substring(0, 4));
-//        ans.put("protocolControl",rawData.substring(4, 8));
-//        ans.put("encryption",rawData.substring(8, 40));
-//        ans.put("apMac",rawData.substring(46, 58));
-//        List<Message> messages = new ArrayList<>();
-//        ans.put("messages",messages);
-//        int messageIndex = 58;
-//        while (messageIndex < rawData.length() - 1) {
-//            String tag = rawData.substring(messageIndex, messageIndex + 2);
-//            if (!tag.equals("00")) {
-//                int len = Integer.parseInt(rawData.substring(messageIndex + 2, messageIndex + 6), 16);
-//                messageIndex += (len * 2 + 6);
-////                System.out.println("出现了一条异常信息:"+tag);
-//                continue;
-//            }
-//            messageIndex += 6;
-//            String devMac = rawData.substring(messageIndex, messageIndex + 12);
-//            if (!dataFilter.isOKMessage(devMac)) {
-//                messageIndex += 34;
-//                continue;
-//            }
-//            int f = Integer.parseInt(rawData.substring(messageIndex + 16, messageIndex + 18), 16);
-//
-//            messageIndex += 32;
-//            int rssiVal = Integer.parseInt(rawData.substring(messageIndex, messageIndex + 2), 16) - 256;
-//            messageIndex += 2;
-//            Message message = new Message(tag, devMac, f, rssiVal, (String) ans.get("apMac"));
-//            messages.add(message);
-//        }
-//
-//        return ans;
-//
-//    }
+
+    @Autowired
+    MongoOperations operations;
+
+    public void saveAndClearUpOffsetMap(){
+        offsetMap.put("saveTime",System.currentTimeMillis());
+        MongoCollection<Document> offsetMapCollection = operations.getCollection("offsetMap");
+        Document document = new Document(new BasicDBObject(offsetMap));
+        offsetMapCollection.insertOne(document);
+        offsetMap = new HashMap<>();
+    }
+
+    public boolean containsKeyForOffsetMap(String mac) {
+        return offsetMap.containsKey(mac);
+    }
+
+    public double getOffsetValByMac(String mac) {
+
+        return (double) offsetMap.get(mac);
+    }
+
+    public void updateOffsetMap(String mac, Double offset) {
+        offsetMap.put(mac, offset);
+    }
 
 
- public boolean containsKeyForOffsetMap(String mac){
-     return offsetMap.containsKey(mac);
- }
- public double getOffsetValByMac(String mac){
-
-     return offsetMap.get(mac);
- }
-
- public void updateOffsetMap(String mac,Double offset){
-     offsetMap.put(mac,offset);
- }
-
-
-
- public List<Message> analyzeData(String rawData,Long scanTime){
-        if(scanTime==null){
+    public List<Message> analyzeData(String rawData, Long scanTime) {
+        if (scanTime == null) {
             scanTime = System.currentTimeMillis();
         }
 
@@ -97,7 +75,7 @@ public class DataUtil {
 //        }
 
         List<Message> messages = new ArrayList<>();
-        String apMac= rawData.substring(46, 58);
+        String apMac = rawData.substring(46, 58);
         int messageIndex = 58;
         while (messageIndex < rawData.length() - 1) {
             String tag = rawData.substring(messageIndex, messageIndex + 2);
@@ -118,7 +96,7 @@ public class DataUtil {
             messageIndex += 32;
             int rssiVal = Integer.parseInt(rawData.substring(messageIndex, messageIndex + 2), 16) - 256;
             messageIndex += 2;
-            Message message = new Message(scanTime,tag, devMac, f, rssiVal, apMac);
+            Message message = new Message(scanTime, tag, devMac, f, rssiVal, apMac);
             messages.add(message);
         }
 
@@ -126,21 +104,21 @@ public class DataUtil {
 
     }
 
-    public List<LocalizeReturnVal> getLocVal(){
+    public List<LocalizeReturnVal> getLocVal() {
         List<LocalizeReturnVal> ans = new ArrayList();
-        Map<String,LocalizeReturnVal> map = new HashMap<>();
-        for(LocalizeReturnVal returnVal:returnVals){
-            if(!map.containsKey(returnVal.getDevMac())){
+        Map<String, LocalizeReturnVal> map = new HashMap<>();
+        for (LocalizeReturnVal returnVal : returnVals) {
+            if (!map.containsKey(returnVal.getDevMac())) {
                 LocalizeReturnVal t = returnVal.clone();
-                map.put(returnVal.getDevMac(),t);
-            }else {
+                map.put(returnVal.getDevMac(), t);
+            } else {
                 LocalizeReturnVal val = map.get(returnVal.getDevMac());
-                if(val.getFrequency()==2){
-                    val.setX(val.getX()*0.6+returnVal.getX()*0.4);
-                    val.setY(val.getY()*0.6+returnVal.getY()*0.4);
-                }else {
-                    val.setX(val.getX()*0.4+returnVal.getX()*0.6);
-                    val.setY(val.getY()*0.4+returnVal.getY()*0.6);
+                if (val.getFrequency() == 2) {
+                    val.setX(val.getX() * 0.6 + returnVal.getX() * 0.4);
+                    val.setY(val.getY() * 0.6 + returnVal.getY() * 0.4);
+                } else {
+                    val.setX(val.getX() * 0.4 + returnVal.getX() * 0.6);
+                    val.setY(val.getY() * 0.4 + returnVal.getY() * 0.6);
                 }
             }
         }
@@ -150,14 +128,14 @@ public class DataUtil {
         return ans;
     }
 
-    public synchronized void updateLocVal(LocalizeReturnVal localizeReturnVal){
-        if(returnVals.isEmpty()){
+    public synchronized void updateLocVal(LocalizeReturnVal localizeReturnVal) {
+        if (returnVals.isEmpty()) {
             returnVals.add(localizeReturnVal);
             return;
         }
-        for (LocalizeReturnVal item:returnVals){
-            if(item.getDevMac().equals(localizeReturnVal.getDevMac())){
-                if(item.getFrequency()==localizeReturnVal.getFrequency()){
+        for (LocalizeReturnVal item : returnVals) {
+            if (item.getDevMac().equals(localizeReturnVal.getDevMac())) {
+                if (item.getFrequency() == localizeReturnVal.getFrequency()) {
                     returnVals.remove(item);
                 }
             }
@@ -165,77 +143,78 @@ public class DataUtil {
         returnVals.add(localizeReturnVal);
     }
 
-    public void putData(List<Message> data){
-        if (dataqueue.addAll(data)){
+    public void putData(List<Message> data) {
+        if (dataqueue.addAll(data)) {
 //                log.info("add data successful:"+data.size());
-        }else {
+        } else {
             log.info("add data failed...");
         }
     }
 
-    public void putRecord(List<Record> record){
+    public void putRecord(List<Record> record) {
 //        System.out.println("添加了:"+record.size()+"条");
         recordqueue.addAll(record);
     }
 
-    public List<Message> collectData(){
+    public List<Message> collectData() {
         List<Message> ans = new ArrayList<>();
         dataqueue.drainTo(ans);
         return ans;
     }
 
-    public List<Record> collectInfo(){
+    public List<Record> collectInfo() {
         List<Record> ans = new ArrayList<>();
         ans.addAll(recordqueue);
         return ans;
     }
-    public void clearUpMessage(Long time){
-        if(dataqueue.size()==0){
+
+    public void clearUpMessage(Long time) {
+        if (dataqueue.size() == 0) {
             return;
         }
-        if(time==null){
+        if (time == null) {
             dataqueue.clear();
             return;
         }
-        while (!dataqueue.isEmpty()){
+        while (!dataqueue.isEmpty()) {
             Message cur = dataqueue.peek();
-            if(cur.getTime()>time){
+            if (cur.getTime() > time) {
                 return;
             }
             dataqueue.poll();
         }
     }
 
-    public void clearUpLocVal(Long time){
-        if(returnVals.size()==0){
+    public void clearUpLocVal(Long time) {
+        if (returnVals.size() == 0) {
             return;
         }
-        if(time==null){
+        if (time == null) {
             returnVals.clear();
             return;
         }
-        while (!returnVals.isEmpty()){
+        while (!returnVals.isEmpty()) {
             LocalizeReturnVal cur = returnVals.peek();
-            if(cur.getUpdateTime()>time){
+            if (cur.getUpdateTime() > time) {
                 return;
             }
             returnVals.poll();
         }
     }
 
-    public void clearUpRecord(Long time){
-        if(recordqueue.size()==0){
+    public void clearUpRecord(Long time) {
+        if (recordqueue.size() == 0) {
             return;
         }
-        if(time==null){
+        if (time == null) {
             recordqueue.clear();
             return;
         }
-        int num =0;
-        while (!recordqueue.isEmpty()){
+        int num = 0;
+        while (!recordqueue.isEmpty()) {
             Record cur = recordqueue.peek();
-            if(cur.getScanTime()>time){
-                System.out.println("清理了"+num+"条数据");
+            if (cur.getScanTime() > time) {
+                System.out.println("清理了" + num + "条数据");
                 return;
             }
             recordqueue.poll();
@@ -244,10 +223,10 @@ public class DataUtil {
 
     }
 
-    public List<Record> getAlgorithmData(Long time){
+    public List<Record> getAlgorithmData(Long time) {
         List<Record> records = new ArrayList<>();
-        for(Record record:recordqueue){
-            if(record.getScanTime()>=time&&record.getUpdateTime()==null){
+        for (Record record : recordqueue) {
+            if (record.getScanTime() >= time && record.getUpdateTime() == null) {
                 records.add(record);
             }
         }

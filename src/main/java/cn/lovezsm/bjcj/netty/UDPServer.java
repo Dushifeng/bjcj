@@ -22,7 +22,13 @@ public class UDPServer{
     public UDPServer(int port) {
         this.port = port;
     }
+    private boolean open =true;
     public void start() throws Exception {
+        if (open==false){
+            return;
+        }
+
+
         final UDPServerHandler serverHandler = new UDPServerHandler();
         log.info("启动服务");
 

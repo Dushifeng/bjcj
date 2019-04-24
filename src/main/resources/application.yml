@@ -18,17 +18,18 @@ log:
   raw_path: ${log.dicPath}/rows_${log.grid_id}.log
   loc_result_path: ${log.dicPath}/locresult_${log.grid_id}.log
   record_path: ${log.dicPath}/record_${log.grid_id}.log
-  dicPath: C:/log/3-26-${random.int}
-  open: false
-  x: 27
-  y: 14.3
-  #1
+  dicPath: C:/log/4-24-${random.int}
+  open: true
+#60-61
+  x: 33.5
+  y: 13.3
+#  #1 143-144
 #  x: 21.5d
 #  y: 17.3d
-#2
+#2 74-75
 #  x: 23.5d
 #  y: 14.3d
-#3  唐总办公室
+#3  唐总办公室 153-154
 #  x: 30d
 #  y: 17.8d
 #4 信号差  王总办公室
@@ -37,12 +38,14 @@ log:
 #5 会议室 信号差 苹果5G
 #  x: 34d
 #  y: 7.8d
-#6
+#6 45-46
 #  x: 18.5d
 #  y: 13.3d
 #7
 #  x: 16.5d
 #  y: 18.3d
+
+
 #  x: 19.5d  #70-71
 #  y: 14.3d
 
@@ -60,7 +63,7 @@ default:
     k: 6
     not_null_val_min_count: 2
     offset_not_null_val: 6
-    offsetOpen: true
+    offsetOpen: false
   apConf:
     info:
       - mac: 70476002a30b
@@ -73,7 +76,6 @@ default:
         x: 33
         y: 16.3
       - mac: 70476002a701
-#      - mac: 70476002a30e
         x: 17
         y: 14.3
       - mac: 70476002a30f
@@ -94,12 +96,12 @@ default:
       06: indirect-ap
     rssi-min: -110
     mac-allow:
-#        - 240995b2909c #旧荣耀
+        - 240995b2909c #旧荣耀
         - 8844771b6789 #华为mate9
-#        - 34d712a2e3dc #锤子
-#        - b8bc1bdbeadd #huawei p8
-#        - 708a096219a1 #徐磊
-#        - 00cdfe012d4c #苹果
+        - 34d712a2e3dc #锤子
+        - b8bc1bdbeadd #huawei p8
+        - 708a096219a1 #徐磊
+        - 00cdfe012d4c #苹果
     mac-refuse:
 
   jobConf:

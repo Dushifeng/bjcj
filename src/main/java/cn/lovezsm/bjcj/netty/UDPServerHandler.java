@@ -43,7 +43,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         }
         String s = ByteBufUtil.hexDump(datagramPacket.content());
 //        System.out.println(s);
-        String apMac= s.substring(46, 58);
+//        String apMac= s.substring(46, 58);
 //        logUtil.log(System.currentTimeMillis()+":"+s,apMac+".log");
         String str = this.filter(s);
 //

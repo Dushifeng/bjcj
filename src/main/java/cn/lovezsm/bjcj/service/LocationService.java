@@ -3,10 +3,7 @@ package cn.lovezsm.bjcj.service;
 import cn.lovezsm.bjcj.algorithm.LocalizeByFingerPrint;
 
 import cn.lovezsm.bjcj.config.GlobeConf;
-import cn.lovezsm.bjcj.task.CleanRecordTask;
-import cn.lovezsm.bjcj.task.LocationTask;
-import cn.lovezsm.bjcj.task.NettyTask;
-import cn.lovezsm.bjcj.task.ProcessRawDataTask;
+import cn.lovezsm.bjcj.task.*;
 import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.data.FingerPrint;
 
@@ -94,6 +91,21 @@ public class LocationService {
                         .repeatForever())
                 .build();
         scheduler.scheduleJob(newJob(CleanRecordTask.class).withIdentity("CleanUpTask").build(), triggerCleanUpTask);
+
+
+
+        JobDataMap jobDataMapOffsetTask = new JobDataMap();
+        jobDataMapOffsetTask.put("dataUtil", dataUtil);
+        Trigger triggerOffsetTask = newTrigger()
+                .withIdentity("Offset")
+                .startAt(futureDate(1, DateBuilder.IntervalUnit.HOUR))
+                .usingJobData(jobDataMapCleanUpTask)
+                .withSchedule(simpleSchedule()
+                        .withIntervalInHours(1)
+                        .repeatForever())
+                .build();
+        scheduler.scheduleJob(newJob(CleanOffsetTask.class).withIdentity("OffsetTask").build(), triggerOffsetTask);
+
 
     }
 
