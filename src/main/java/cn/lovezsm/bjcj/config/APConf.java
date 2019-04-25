@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 public class APConf {
     private List<AP> info;
-
+    private int coefficientNum=3;
     public int getApnum() {
         return info.size();
     }
@@ -47,5 +47,25 @@ public class APConf {
             }
         }
         return -1;
+    }
+
+    public int getCoefficientNum() {
+        return coefficientNum;
+    }
+
+    public int getFrequencyCoefficient(int frequency) {
+        if(frequency<=14){
+            return 0;
+        }
+        else if(frequency<=64){
+
+            return 1;
+
+        }else{
+
+            return 2;
+        }
+
+
     }
 }

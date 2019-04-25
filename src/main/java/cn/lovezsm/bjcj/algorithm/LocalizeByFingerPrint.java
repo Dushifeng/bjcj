@@ -60,6 +60,9 @@ public class LocalizeByFingerPrint {
             double[] fFusionTemp = AlgorithmUtil.getMatrix(gridNum,0);
             for (int ng =0;ng<gridNum;ng++){
                 // (1/(sqrt(2*pi)*rssStd(num_grid, j )))*exp((rss(j)-rssMean(num_grid,j))^2/(-2*rssStd(num_grid,j)^2));
+                if(fingerPrint.getStd()[ng][i]==0){
+                    fingerPrint.getStd()[ng][i]=0.1;
+                }
                 fFusionTemp[ng] = (1/(Math.sqrt(2*Math.PI)*fingerPrint.getStd()[ng][i]))*Math.exp((rssi[i]-fingerPrint.getAvg()[ng][i])*(rssi[i]-fingerPrint.getAvg()[ng][i])/(-2*fingerPrint.getStd()[ng][i]*fingerPrint.getStd()[ng][i]));
                //累乘概率值，得到该设备在每一个晶格的似然值
                 fFusion[ng] = fFusion[ng]*fFusionTemp[ng];

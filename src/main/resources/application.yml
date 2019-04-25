@@ -61,7 +61,7 @@ default:
     sliding_window_time: 180
     sliding_step_time: 10
     k: 6
-    not_null_val_min_count: 2
+    not_null_val_min_count: 5
     offset_not_null_val: 6
     offsetOpen: false
   apConf:
@@ -96,12 +96,12 @@ default:
       06: indirect-ap
     rssi-min: -110
     mac-allow:
-        - 240995b2909c #旧荣耀
+#        - 240995b2909c #旧荣耀
         - 8844771b6789 #华为mate9
-        - 34d712a2e3dc #锤子
-        - b8bc1bdbeadd #huawei p8
-        - 708a096219a1 #徐磊
-        - 00cdfe012d4c #苹果
+#        - 34d712a2e3dc #锤子
+#        - b8bc1bdbeadd #huawei p8
+#        - 708a096219a1 #徐磊
+#        - 00cdfe012d4c #苹果
     mac-refuse:
 
   jobConf:

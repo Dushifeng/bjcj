@@ -61,7 +61,7 @@ public class LocationService {
         scheduler.scheduleJob(newJob(ProcessRawDataTask.class).withIdentity("ProcessRawDataTask").build(), triggerProcessRawDataTask);
 
         JobDataMap jobDataMapLocationTask = new JobDataMap();
-        jobDataMapLocationTask.put("apNum",globeConf.getApConf().getApnum());
+        jobDataMapLocationTask.put("apConf",globeConf.getApConf());
         jobDataMapLocationTask.put("algorithmConf",globeConf.getAlgorithmConf());
         jobDataMapLocationTask.put("fingerPrints",globeConf.getFingerPrints());
         jobDataMapLocationTask.put("dataUtils", dataUtil);

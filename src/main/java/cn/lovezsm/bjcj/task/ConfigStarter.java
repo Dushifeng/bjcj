@@ -27,19 +27,32 @@ public class ConfigStarter implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String avgPath_2G = "C:\\data\\Fingerprint_avg_2GHZ.dat";
         String stdPath_2G = "C:\\data\\Fingerprint_std_2GHZ.dat";
-        String avgPath_5G = "C:\\data\\Fingerprint_avg_5G.dat";
-        String stdPath_5G = "C:\\data\\Fingerprint_std_5G.dat";
+
+        String avgPath_5G_G100 = "C:\\data\\Fingerprint_avg_5G_G100.dat";
+        String stdPath_5G_G100 = "C:\\data\\Fingerprint_std_5G_G100.dat";
+
+        String avgPath_5G_L100 = "C:\\data\\Fingerprint_avg_5G_L100.dat";
+        String stdPath_5G_L100 = "C:\\data\\Fingerprint_std_5G_L100.dat";
+
+
         String gridPath = "C:\\data\\grid.txt";
+
         FingerPrintBuilder fingerPrintBuilder_2G = new FingerPrintBuilderByFile(new File(avgPath_2G),new File(stdPath_2G),6);
-        FingerPrintBuilder fingerPrintBuilder_5G = new FingerPrintBuilderByFile(new File(avgPath_5G),new File(stdPath_5G),6);
+        FingerPrintBuilder fingerPrintBuilder_5G_L100 = new FingerPrintBuilderByFile(new File(avgPath_5G_L100),new File(stdPath_5G_L100),6);
+        FingerPrintBuilder fingerPrintBuilder_5G_G100 = new FingerPrintBuilderByFile(new File(avgPath_5G_G100),new File(stdPath_5G_G100),6);
+
 
         FingerPrint fingerprint2G = fingerPrintBuilder_2G.build("2G",false);
-//        FingerPrint fingerPrint5G = fingerPrintBuilder_5G.build("5G",false);
-        FingerPrint fingerPrint5G = fingerPrintBuilder_2G.build("5G",true);
+        FingerPrint fingerPrint5G_L100 = fingerPrintBuilder_5G_L100.build("5G_L100",false);
+        FingerPrint fingerPrint5G_G100 = fingerPrintBuilder_5G_G100.build("5G_G100",false);
+//        FingerPrint fingerPrint5G = fingerPrintBuilder_2G.build("5G",true);
+
         GlobeConf globeConf = SpringUtil.getBean(GlobeConf.class);
         List<FingerPrint> fingerPrints = new ArrayList<>();
         fingerPrints.add(fingerprint2G);
-        fingerPrints.add(fingerPrint5G);
+        fingerPrints.add(fingerPrint5G_G100);
+        fingerPrints.add(fingerPrint5G_L100);
+
         globeConf.setFingerPrints(fingerPrints);
 
         GridMap gridMap = GridMap.buildByFile(new File(gridPath),"深圳办公室");

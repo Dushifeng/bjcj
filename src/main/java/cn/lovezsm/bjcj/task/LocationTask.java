@@ -2,6 +2,7 @@ package cn.lovezsm.bjcj.task;
 
 import cn.lovezsm.bjcj.algorithm.CalculateOffset;
 import cn.lovezsm.bjcj.algorithm.LocalizeByFingerPrint;
+import cn.lovezsm.bjcj.config.APConf;
 import cn.lovezsm.bjcj.config.AlgorithmConf;
 import cn.lovezsm.bjcj.data.FingerPrint;
 import cn.lovezsm.bjcj.data.GridMap;
@@ -32,7 +33,7 @@ public class LocationTask extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
         AlgorithmConf algorithmConf = (AlgorithmConf) dataMap.get("algorithmConf");
-        int apNum = dataMap.getInt("apNum");
+        APConf apConf = (APConf) dataMap.get("apConf");
 
         List<FingerPrint> fingerPrints = (List<FingerPrint>) dataMap.get("fingerPrints");
         GridMap gridMap = (GridMap) dataMap.get("gridMap");
@@ -43,13 +44,28 @@ public class LocationTask extends QuartzJobBean {
         List<Record> records = dataUtil.getAlgorithmData(System.currentTimeMillis()-stepTime*1000);
         Map<String,Double[]> valueMap = new HashMap<>();
         Map<String,Integer[]> countMap = new HashMap<>();
-        FingerPrint fingerPrint_2G = fingerPrints.get(0);
-        System.out.println(fingerPrint_2G.getName());
-        FingerPrint fingerPrint_5G = fingerPrints.get(1);
+        FingerPrint fingerPrint = new FingerPrint();
+
+        Double[][] std = new Double[gridMap.getGridNum()][apConf.getApnum()*fingerPrints.size()];
+        Double[][] avg = new Double[gridMap.getGridNum()][apConf.getApnum()*fingerPrints.size()];;
+        for(int t=0;t<fingerPrints.size();t++){
+            Double[][] t_std = fingerPrints.get(t).getStd();
+            Double[][] t_avg = fingerPrints.get(t).getAvg();
+            for(int i=0;i<gridMap.getGridNum();i++){
+                for (int j=0;j<apConf.getApnum();j++){
+                    std[i][6*t+j] = t_std[i][j];
+                    avg[i][6*t+j] = t_avg[i][j];
+                }
+            }
+        }
+
+        fingerPrint.setAvg(avg);
+        fingerPrint.setStd(std);
+        fingerPrint.setStandardization(false);
 
 
         for(Record record:records){
-            String key = record.getDevMac()+"_"+record.getFrequency();
+            String key = record.getDevMac();
             if(valueMap.containsKey(key)){
                 Double[] doubles = valueMap.get(key);
                 Integer[] integers = countMap.get(key);
@@ -60,9 +76,10 @@ public class LocationTask extends QuartzJobBean {
                     }
                 }
             }else{
-                Double[] doubles = new Double[apNum];
-                Integer[] integers = new Integer[apNum];
-                for (int i=0;i<apNum;i++){
+                int length = record.getRssi().length;
+                Double[] doubles = new Double[length];
+                Integer[] integers = new Integer[length];
+                for (int i=0;i<length;i++){
                     if(record.getRssi()[i]!=null){
                         doubles[i]=record.getRssi()[i];
                         integers[i] = 1;
@@ -78,18 +95,16 @@ public class LocationTask extends QuartzJobBean {
 //        Map<String,Double[]> culMap = new HashMap<>();
         Iterator<String> keyIter = valueMap.keySet().iterator();
         while (keyIter.hasNext()){
-            String key = keyIter.next();
-            Double[] rssi = valueMap.get(key);
-            Integer[] integers = countMap.get(key);
-            for(int i =0;i<apNum;i++){
-                if(integers[i]>0){
-                    rssi[i] = rssi[i]/integers[i];
+            String devMac = keyIter.next();
+            Double[] rssi = valueMap.get(devMac);
+            Integer[] counts = countMap.get(devMac);
+            for(int i =0;i<rssi.length;i++){
+                if(counts[i]>0){
+                    rssi[i] = rssi[i]/counts[i];
                 }else {
                     rssi[i] = -100d;
                 }
             }
-            String devMac = key.split("_")[0];
-            Integer frequency = Integer.parseInt(key.split("_")[1]);
             LocalizeReturnVal val;
             LocalizeByFingerPrint localizeByFingerPrint = LocalizeByFingerPrint.getInstance();
 
@@ -98,12 +113,7 @@ public class LocationTask extends QuartzJobBean {
                 continue;
             }
 //            culMap.put(key,rssi);
-            FingerPrint fingerPrint = null;
-            if(frequency==2){
-                fingerPrint = fingerPrint_2G;
-            }else {
-                fingerPrint = fingerPrint_5G;
-            }
+
             if(algorithmConf.isOffsetOpen()&&count>=algorithmConf.getOffsetNotNullVal()){
                 double offsetVal = CalculateOffset.doCalculate(rssi, k, fingerPrint, gridMap);
                 if(Math.abs(offsetVal)<12){
@@ -128,57 +138,56 @@ public class LocationTask extends QuartzJobBean {
             val = localizeByFingerPrint.doCalculate(rssi, k, fingerPrint, gridMap);
 
             long time = System.currentTimeMillis();
-            val.setFrequency(frequency);
             val.setUpdateTime(time);
-            double error = -1d;
-            String content="";
-            Object[] pro = val.getProbCandidate().toArray();
-            for (int i =0;i<pro.length;i++){
-                if(Double.isNaN((Double)pro[i])||Double.isInfinite((Double)pro[i])){
-                    System.out.println("error");
-                }
-                pro[i] = new BigDecimal((Double) pro[i]).setScale(2, RoundingMode.UP).doubleValue();
-            }
-
-            if(logUtil.getLogConf().getX()!=-1d&&logUtil.getLogConf().getY()!=-1d){
-                error = AlgorithmUtil.euclideanDistance(val.getX(), val.getY(), logUtil.getLogConf().getX(),logUtil.getLogConf().getY());
-                if(Double.isNaN(error)||Double.isInfinite(error)){
-                    error = 0d;
-                }else {
-                    error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
-                }
-                error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
-
-                if(error>7){
-                    System.out.println("exception...");
-                    StringBuffer sb = new StringBuffer();
-                    for (Record record:records){
-                        if(record.getDevMac().equals(devMac)){
-                            sb.append(record.getFrequency()+";");
-                            sb.append(Arrays.toString(record.getRssi()));
-                        }
-                    }
-                    logUtil.log(time+","+devMac+","+error+","+val.getX()+","+val.getY()+","+sb.toString()+","+Arrays.toString(rssi),"exceptionData.log");
-                }
-                content =   time + ","+ devMac+ ","+ frequency + ","+ new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(pro) + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getX()-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getY()-val.getY())).setScale(2, RoundingMode.UP).doubleValue()+ ","+ error;
-            }else if(logUtil.getLogConf().getGridId()!=-1){
-                int id = logUtil.getLogConf().getGridId()-1;
-                double grid_x = gridMap.getPosX()[id];
-                double grid_y = gridMap.getPosY()[id];
-                error = AlgorithmUtil.euclideanDistance(val.getX(),val.getY(),grid_x,grid_y);
-                if(Double.isNaN(error)||Double.isInfinite(error)){
-                    error = 0d;
-                }else {
-                    error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
-                }
-                content =  time + ","+ devMac+ ","+ frequency + ","+ new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(pro) + ","+ new BigDecimal(Math.abs(grid_x-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(grid_y-val.getY())).setScale(2, RoundingMode.UP).doubleValue() + ","+ error;
-            }
-            //locx,locy,
-            logUtil.log(content,devMac+logUtil.getLogConf().getLogPath()+"local.log");
+//            double error = -1d;
+//            String content="";
+//            Object[] pro = val.getProbCandidate().toArray();
+//            for (int i =0;i<pro.length;i++){
+//                if(Double.isNaN((Double)pro[i])||Double.isInfinite((Double)pro[i])){
+//                    System.out.println("error");
+//                }
+//                pro[i] = new BigDecimal((Double) pro[i]).setScale(2, RoundingMode.UP).doubleValue();
+//            }
+//
+//            if(logUtil.getLogConf().getX()!=-1d&&logUtil.getLogConf().getY()!=-1d){
+//                error = AlgorithmUtil.euclideanDistance(val.getX(), val.getY(), logUtil.getLogConf().getX(),logUtil.getLogConf().getY());
+//                if(Double.isNaN(error)||Double.isInfinite(error)){
+//                    error = 0d;
+//                }else {
+//                    error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
+//                }
+//                error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
+//
+//                if(error>7){
+//                    System.out.println("exception...");
+//                    StringBuffer sb = new StringBuffer();
+//                    for (Record record:records){
+//                        if(record.getDevMac().equals(devMac)){
+////                            sb.append(record.getFrequency()+";");
+//                            sb.append(Arrays.toString(record.getRssi()));
+//                        }
+//                    }
+//                    logUtil.log(time+","+devMac+","+error+","+val.getX()+","+val.getY()+","+sb.toString()+","+Arrays.toString(rssi),"exceptionData.log");
+//                }
+//                content =   time + ","+ devMac+ ","+  new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(pro) + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getX()-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(logUtil.getLogConf().getY()-val.getY())).setScale(2, RoundingMode.UP).doubleValue()+ ","+ error;
+//            }else if(logUtil.getLogConf().getGridId()!=-1){
+//                int id = logUtil.getLogConf().getGridId()-1;
+//                double grid_x = gridMap.getPosX()[id];
+//                double grid_y = gridMap.getPosY()[id];
+//                error = AlgorithmUtil.euclideanDistance(val.getX(),val.getY(),grid_x,grid_y);
+//                if(Double.isNaN(error)||Double.isInfinite(error)){
+//                    error = 0d;
+//                }else {
+//                    error = new BigDecimal(error).setScale(2, RoundingMode.UP).doubleValue();
+//                }
+//                content =  time + ","+ devMac+ ","+  new BigDecimal(val.getX()).setScale(2, RoundingMode.UP).doubleValue() + "," + new BigDecimal(val.getY()).setScale(2, RoundingMode.UP).doubleValue() + "," + FileUtil.toString(val.getIdxCandidate().toArray()) + "," + FileUtil.toString(pro) + ","+ new BigDecimal(Math.abs(grid_x-val.getX())).setScale(2, RoundingMode.UP).doubleValue() + ","+ new BigDecimal(Math.abs(grid_y-val.getY())).setScale(2, RoundingMode.UP).doubleValue() + ","+ error;
+//            }
+//            //locx,locy,
+//            logUtil.log(content,devMac+logUtil.getLogConf().getLogPath()+"local.log");
 
             val.setDevMac(devMac);
             val.setUpdateTime(System.currentTimeMillis());
-            System.out.println("Mac:"+devMac+"   frequency:"+frequency+"   "+val);
+            System.out.println("Mac:"+devMac+"            "+val);
             dataUtil.updateLocVal(val);
         }
 

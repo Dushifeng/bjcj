@@ -31,21 +31,15 @@ public class ProcessRawDataTask extends QuartzJobBean {
 
         Map<String, Integer> valueMap = new Hashtable<>();
         Map<String, Integer> countMap = new Hashtable<>();
-        int f=2;
         for (Message message : dl) {
-            if(message.getFrequency()<15){
-                f = 2;
-            }else {
-                f = 5;
-            }
-            if (valueMap.containsKey(message.getApMac() + "_" + message.getDevMac() + "_"+f)) {
-                Integer val = valueMap.get(message.getApMac() + "_" + message.getDevMac()+ "_"+f);
-                Integer count = countMap.get(message.getApMac() + "_" + message.getDevMac()+ "_"+f);
-                valueMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+f, val + message.getRssi());
-                countMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+f, ++count);
+            if (valueMap.containsKey(message.getApMac() + "_" + message.getDevMac() + "_"+message.getFrequency())) {
+                Integer val = valueMap.get(message.getApMac() + "_" + message.getDevMac()+ "_"+message.getFrequency());
+                Integer count = countMap.get(message.getApMac() + "_" + message.getDevMac()+ "_"+message.getFrequency());
+                valueMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+message.getFrequency(), val + message.getRssi());
+                countMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+message.getFrequency(), ++count);
             } else {
-                valueMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+f, message.getRssi());
-                countMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+f, 1);
+                valueMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+message.getFrequency(), message.getRssi());
+                countMap.put(message.getApMac() + "_" + message.getDevMac()+ "_"+message.getFrequency(), 1);
             }
         }
         long scanTime = dl.get(0).getTime();
@@ -56,7 +50,6 @@ public class ProcessRawDataTask extends QuartzJobBean {
             String key = keyIter.next();
             Integer count = countMap.get(key);
             Integer value = valueMap.get(key);
-
             String[] keyArray = key.split("_");
             String apMac = keyArray[0];
             String devMac = keyArray[1];
@@ -64,28 +57,24 @@ public class ProcessRawDataTask extends QuartzJobBean {
             Double avgRssi = (value * 1.0d) / count;
 
 
-
-            if (rssiMap.containsKey(devMac+"_"+frequency)) {
-                Double[] rssiArray = rssiMap.get(devMac+"_"+frequency);
-                rssiArray[apConf.getApId(apMac)] = avgRssi;
-            } else {
-                Double[] rssiArray = new Double[apConf.getInfo().size()];
-                rssiArray[apConf.getApId(apMac)] = avgRssi;
-                rssiMap.put(devMac+"_"+frequency, rssiArray);
+            if (!rssiMap.containsKey(devMac)) {
+                Double[] rssiArray = new Double[apConf.getInfo().size()*apConf.getCoefficientNum()];
+                rssiMap.put(devMac, rssiArray);
             }
+            Double[] rssiArray = rssiMap.get(devMac);
+            int frequencyCoefficient = apConf.getFrequencyCoefficient(frequency);
+            int rssi_loc = frequencyCoefficient*6+apConf.getApId(apMac);
+            rssiArray[rssi_loc] = avgRssi;
         }
 
         Iterator<String> rssiIter = rssiMap.keySet().iterator();
         List<Record> records = new ArrayList<>();
         while (rssiIter.hasNext()) {
-            String[] split = rssiIter.next().split("_");
-            String devMac = split[0];
-            int frequency = Integer.parseInt(split[1]);
+            String devMac = rssiIter.next();
             Record record = new Record();
             record.setDevMac(devMac);
-            record.setRssi(rssiMap.get(devMac+"_"+frequency));
+            record.setRssi(rssiMap.get(devMac));
             record.setScanTime(scanTime);
-            record.setFrequency(frequency);
             records.add(record);
         }
 //        logUtil.logRecord(records);

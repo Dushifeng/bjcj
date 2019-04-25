@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Record {
-    private int frequency;
+//    private int frequency;
     private Long scanTime;
     private Long updateTime;
     private Double[] rssi;
@@ -35,7 +35,7 @@ public class Record {
 
         return  scanTime + ","
                 + devMac + ","
-                + frequency +","
+//                + frequency +","
                 + FileUtil.toString(out);
 
     }
