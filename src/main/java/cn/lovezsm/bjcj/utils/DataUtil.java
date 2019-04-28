@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,9 +31,16 @@ public class DataUtil {
     private BlockingQueue<Record> recordqueue = new LinkedBlockingQueue<>();
     public BlockingQueue<LocalizeReturnVal> returnVals = new LinkedBlockingQueue<>();
 
-    private Map<String, Object> offsetMap = new ConcurrentHashMap<>();
+
+    private Map<String,Map<String, Object>> offsetMap = new ConcurrentHashMap<>();
 
     private final Logger log = LoggerFactory.getLogger(DataUtil.class);
+    @PostConstruct
+    public void init(){
+        offsetMap.put("v1",new HashMap<>());
+        offsetMap.put("v2",new HashMap<>());
+        offsetMap.put("v3",new HashMap<>());
+    }
 
 
     @Autowired
@@ -43,24 +51,25 @@ public class DataUtil {
     MongoOperations operations;
 
     public void saveAndClearUpOffsetMap(){
-        offsetMap.put("saveTime",System.currentTimeMillis());
-        MongoCollection<Document> offsetMapCollection = operations.getCollection("offsetMap");
-        Document document = new Document(new BasicDBObject(offsetMap));
-        offsetMapCollection.insertOne(document);
-        offsetMap = new HashMap<>();
+//        offsetMap.put("saveTime",System.currentTimeMillis());
+//        MongoCollection<Document> offsetMapCollection = operations.getCollection("offsetMap");
+//        Document document = new Document(new BasicDBObject(offsetMap));
+//        offsetMapCollection.insertOne(document);
+//        offsetMap = new HashMap<>();
     }
 
     public boolean containsKeyForOffsetMap(String mac) {
         return offsetMap.containsKey(mac);
     }
 
-    public double getOffsetValByMac(String mac) {
-
-        return (double) offsetMap.get(mac);
+    public double getOffsetValByMac(String vision,String mac) {
+        Map<String, Object> map = offsetMap.get(vision);
+        return (double) map.get(mac);
     }
 
-    public void updateOffsetMap(String mac, Double offset) {
-        offsetMap.put(mac, offset);
+    public void updateOffsetMap(String vision,String mac, Double offset) {
+        Map<String, Object> map = offsetMap.get(vision);
+        map.put(mac, offset);
     }
 
 

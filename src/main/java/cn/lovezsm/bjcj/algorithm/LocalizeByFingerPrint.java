@@ -33,19 +33,11 @@ import java.util.Arrays;
  * % rss每个元素表示对应AP的RSS值，如果对应AP没有探测到该设备，则取值-200
  */
 
-@Component
-public class LocalizeByFingerPrint {
-
-    private static LocalizeByFingerPrint instance = new LocalizeByFingerPrint();
-
-    public static LocalizeByFingerPrint getInstance() {
-        return instance;
+public class LocalizeByFingerPrint extends Localizer {
+    public LocalizeByFingerPrint(String mac,Double[] rssi, int k, FingerPrint fingerPrint, GridMap gridMap,String vision) {
+        super(mac,rssi, k, fingerPrint, gridMap,vision);
     }
-
-    private LocalizeByFingerPrint() {
-    }
-
-    public LocalizeReturnVal doCalculate(Double[] rssi, int k, FingerPrint fingerPrint, GridMap gridMap){
+    public LocalizeReturnVal doCalculate(){
 
         if(fingerPrint.isStandardization()){
             //标准化rssi
@@ -87,9 +79,9 @@ public class LocalizeByFingerPrint {
         for(int i=0;i<idxCandidate.length;i++){
             probCandidate[i] = fFusion[idxCandidate[i]];
         }
-
         returnVal.setProbCandidate(probCandidate);
 
+        this.returnVal = returnVal;
         return returnVal;
     }
 

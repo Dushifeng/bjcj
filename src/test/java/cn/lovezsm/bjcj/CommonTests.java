@@ -25,6 +25,21 @@ import java.util.*;
 public class CommonTests {
 
     @Test
+    public void testDoubleArray(){
+        Double[] d1 = new Double[5];
+        Double[] d2 = new Double[5];
+        for (int i =0;i<5;i++){
+            d1[i] = 5d;
+            d2[i] = d1[i];
+        }
+
+        System.out.println(Arrays.toString(d1));
+        d2[0] = 10d;
+        System.out.println(Arrays.toString(d1));
+
+    }
+
+    @Test
     public void testFileUtil() throws IOException {
 //        System.out.println(FileUtil.getTotalLines(new File("C:\\data\\Fingerprint_avg.dat")));
         System.out.println(new Date());

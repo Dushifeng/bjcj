@@ -21,8 +21,8 @@ log:
   dicPath: C:/log/4-24-${random.int}
   open: true
 #60-61
-  x: 33.5
-  y: 13.3
+  x: 35.0
+  y: 8.3
 #  #1 143-144
 #  x: 21.5d
 #  y: 17.3d
@@ -96,8 +96,8 @@ default:
       06: indirect-ap
     rssi-min: -110
     mac-allow:
-#        - 240995b2909c #旧荣耀
-        - 8844771b6789 #华为mate9
+        - 240995b2909c #旧荣耀
+#        - 8844771b6789 #华为mate9
 #        - 34d712a2e3dc #锤子
 #        - b8bc1bdbeadd #huawei p8
 #        - 708a096219a1 #徐磊
