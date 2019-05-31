@@ -35,7 +35,7 @@ public class MainController {
 
     @GetMapping("/getLocInfo")
     @ResponseBody
-    public Map getLocInfo(){
+    public  List<LocalizeReturnVal> getLocInfo(){
 //        {x1:72,y1:11,x2:166,y2:92},
 //        {x1:69,y1:92,x2:163,y2:118},
 //        {x1:263,y1:10,x2:455,y2:92},
@@ -47,31 +47,35 @@ public class MainController {
             restrictedArea.put(3,new Double[]{0d,6d,6.8d,8.1d});
             restrictedArea.put(4,new Double[]{21d,6d,28d,12d});
             restrictedArea.put(5,new Double[]{14d,48d,23.5,54d});
+            restrictedArea.put(6,new Double[]{14d,32d,19.25,46.2});
         }
 
         List<LocalizeReturnVal> locVal = dataUtil.getLocVal();
-        List<LocalizeReturnVal> submitData = new ArrayList<>();
+//        List<LocalizeReturnVal> submitData = new ArrayList<>();
         for(LocalizeReturnVal val:locVal){
             double x = val.getX();
             double y = val.getY();
+            if(val.getDevMac().equals("a4be2bed0a30")||val.getDevMac().equals("a4be2bed0a30")||val.getDevMac().equals("340a98839bb0")||val.getDevMac().equals("a4be2bed00d0")){
+                System.out.println(val.getX()+"  "+val.getY()+"  "+val);
+            }
             for(Map.Entry<Integer,Double[]> entry:restrictedArea.entrySet()){
                 Double[] area = entry.getValue();
-                if((area[0]<x&&area[2]>x)&&(area[1]<y&&area[3]>y)){
+                if((area[0]<=x&&area[2]>=x)&&(area[1]<=y&&area[3]>=y)){
                     val.setValid(false);
                 }
             }
         }
 
-        for(LocalizeReturnVal val:locVal){
-            if(val.isValid()){
-                submitData.add(val);
-            }
-        }
+//        for(LocalizeReturnVal val:locVal){
+//            if(val.isValid()){
+//                submitData.add(val);
+//            }
+//        }
 
         Map<String,Object> map = new HashMap<>();
-        map.put("locPoint",submitData);
+        map.put("locPoint",locVal);
         map.put("heatMap",ls.calculateDeviceDensity(locVal));
-        return map;
+        return locVal;
     }
     @ResponseBody
     @GetMapping("/getHeatMapData")

@@ -124,12 +124,16 @@ public class LocationTask extends QuartzJobBean {
 //            LocalizeReturnVal val2 = localize2.doCalculate();
             Localizer localize3 = new LocalizeByFingerPrintV2(devMac,rssi,k,fingerPrint,gridMap,"v3");
             LocalizeReturnVal val3 = localize3.doCalculate();
+
+            if(val3==null||Double.isNaN(val3.getX())||Double.isNaN(val3.getY())){
+                continue;
+            }
             val3.setUpdateTime(System.currentTimeMillis());
             val3.setDevMac(devMac);
             dataUtil.updateLocVal(val3);
         }
         System.out.println("个数："+valueMap.keySet().size());
 //            dataUtil.updateLocVal(val);
-        }
+    }
 
 }

@@ -26,19 +26,19 @@
         <div class="col-3">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">2.4G设备个数</span>
+                    <span class="input-group-text">设备个数</span>
                 </div>
                 <input class="form-control" id="count_2G" disabled>
             </div>
         </div>
-        <div class="col-3">
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">5.8G设备个数</span>
-                </div>
-                <input class="form-control" id="count_5G" disabled>
-            </div>
-        </div>
+        <!--        <div class="col-3">-->
+        <!--            <div class="input-group">-->
+        <!--                <div class="input-group-prepend">-->
+        <!--                    <span class="input-group-text">5.8G设备个数</span>-->
+        <!--                </div>-->
+        <!--                <input class="form-control" id="count_5G" disabled>-->
+        <!--            </div>-->
+        <!--        </div>-->
         <div class="col-3">
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -145,9 +145,9 @@
                     count_5++
                 }
                 if((mac_allow!=""&&mac_allow.toLowerCase()==dev.devMac.toLowerCase())||mac_allow==""){
-                    x = dev.x*zoom_x+offset_x
-                    y = dev.y*zoom_y+offset_y
-                    if(isInRestrictedArea(x,y)==false){
+                    if(dev.x!=null&&dev.y!=null&&dev.valid==true){
+                        x = dev.x*zoom_x+offset_x
+                        y = dev.y*zoom_y+offset_y
                         cxt.beginPath();
                         cxt.arc(x,y,3,0,Math.PI*2,true)
                         cxt.closePath();
@@ -155,9 +155,9 @@
                     }
                 }
             });
-            $("#count_2G").val(count_2)
-            $("#count_5G").val(count_5)
-             // upDateHeatMap(ans.heatMap)
+            $("#count_2G").val(count_2+count_5)
+            // $("#count_5G").val(count_5)
+//              upDateHeatMap(ans.heatMap)
         });
     }
     var heatmapInstance = h337.create({
@@ -171,8 +171,8 @@
             var val = data.deviceDensity[len]
             max = Math.max(max, val);
             var point = {
-                x: data.posX[len]*1000/zoom,
-                y: data.posY[len]*1000/zoom,
+                x: data.posX[len]*zoom_x+offset_x,
+                y: data.posY[len]*zoom_y+offset_y,
                 value: val
             };
             points.push(point);
@@ -183,7 +183,6 @@
             data: points
         };
         heatmapInstance.setData(data); //数据绑定还可以使用
-        console.log(data)
     }
 
     function getAPLoc(cxt) {
