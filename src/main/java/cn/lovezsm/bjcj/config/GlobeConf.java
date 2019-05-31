@@ -21,4 +21,5 @@ public class GlobeConf {
     private List<FingerPrint> fingerPrints;
     private GridMap gridMap;
     private JobConf jobConf;
+    private FileConf fileConf;
 }

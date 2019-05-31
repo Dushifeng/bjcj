@@ -37,10 +37,12 @@ public class GridMap {
             FileReader fileReader = new FileReader(file);
             BufferedReader reader = new BufferedReader(fileReader);
 
-
             for(int i =0;i<gridNum;i++){
                 String line = reader.readLine();
-                String[] split = line.trim().split("-");
+                if(line == null) {
+                    continue;
+                }
+                String[] split = line.trim().split("_");
                 if(split.length<5){
                     logger.error("文件数据有误，行参数不足5个");
                     return null;

@@ -2,11 +2,9 @@ package cn.lovezsm.bjcj.config;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 
-@Document
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

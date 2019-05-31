@@ -9,6 +9,8 @@ import cn.lovezsm.bjcj.utils.AlgorithmUtil;
 import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.utils.SpringUtil;
 
+import java.util.Arrays;
+
 public class LocalizeByFingerPrintV2 extends Localizer {
 
     AlgorithmConf algorithmConf;
@@ -22,13 +24,12 @@ public class LocalizeByFingerPrintV2 extends Localizer {
         localizeByFingerPrint = new LocalizeByFingerPrint(mac,rssi,k,fingerPrint,gridMap,"v1");
     }
 
+
     @Override
     public LocalizeReturnVal doCalculate() {
         int count = AlgorithmUtil.checkNotNullValCount(rssi);
         if(algorithmConf.isOffsetOpen()&&count>=algorithmConf.getOffsetNotNullVal()){
             double offsetVal = CalculateOffset.doCalculate(rssi, k, fingerPrint, gridMap);
-
-
 
             if(Math.abs(offsetVal)<12){
                 if(dataUtil.containsKeyForOffsetMap(this.mac)){
@@ -48,9 +49,8 @@ public class LocalizeByFingerPrintV2 extends Localizer {
                 }
             }
         }
-
+        System.out.println(Arrays.toString(rssi));
         this.returnVal = localizeByFingerPrint.doCalculate();
         return returnVal;
     }
-
 }

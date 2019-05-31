@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>深圳戴升智能</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-table/1.13.5/bootstrap-table.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="row">
+        <div class="col-6">
+            <div class="row" style="margin: 0 auto;">
+                <canvas width="900" height="410" id="map" style="margin-top: 10px;margin-left: 10px"></canvas>
+            </div>
+            <div class="row" style="margin: 0 auto;">
+                <canvas width="900" height="410" id="map2" style="margin-left: 10px"></canvas>
+            </div>
+        </div>
+        <div class="col-6">
+
+        </div>
+    </div>
+
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/heatmap.js/2.0.2/heatmap.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/locale/bootstrap-table-zh-CN.min.js"></script>
+<script>
+    var zoom = 22
+    var mac_allow = "8844771b6789"
+
+    $(function () {
+        var c=document.getElementById("map");
+        var cxt=c.getContext("2d");
+
+        var c2=document.getElementById("map2");
+        var cxt2=c2.getContext("2d");
+
+        buildMap(cxt);
+        buildMap(cxt2);
+        setInterval("getLocInfo()",1000);
+        // setInterval(getHeatMapData,5000);
+        // $("#showError").click(search)
+    })
+
+
+
+    function search() {
+        mac_allow=""
+
+        console.log("hello...")
+        var m = $("#macInput").val()
+
+        for(var i=0;i<m.length;i++){
+            if(m[i]!=':'){
+                mac_allow+=m[i]
+            }
+        }
+    }
+    function getLocInfo() {
+        var c=document.getElementById("map");
+        var cxt=c.getContext("2d");
+        c.height=c.height;
+        buildMap(cxt);
+        getAPLoc(cxt)
+        var count_2 = 0;
+        var count_5 = 0;
+        $.get("/getLocInfo", function(ans){
+            $.each(ans,function(index,dev){
+                cxt.fillStyle="#0066FF";
+                // if(dev.frequency==2){
+                //     count_2++
+                // }else {
+                //     count_5++
+                // }
+                if((mac_allow!=""&&mac_allow==dev.devMac)||mac_allow==""){
+                    cxt.beginPath();
+                    // cxt.arc(dev.x*40,dev.y*40,dev.confidence*10,0,Math.PI*2,true)
+                    cxt.arc(dev.y*1000/zoom,dev.x*1000/zoom,2,0,Math.PI*2,true)
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            });
+            // $("#count_2G").val(count_2)
+            // $("#count_5G").val(count_5)
+            // upDateHeatMap(ans)
+        });
+    }
+    function upDateHeatMap(locInfo) {
+        var heatmapInstance = h337.create({
+            container: document.querySelector('#map2'),
+        });
+
+        var points = [];
+        var max = 0;
+        var width = 28;
+        var height = 54;
+        var len = 350;
+        while (len--) {
+            var val = Math.floor(Math.random()*2);
+            max = Math.max(max, val);
+            var point = {
+                x: Math.floor(Math.random()*width),
+                y: Math.floor(Math.random()*height),
+                value: val
+            };
+            points.push(point);
+        }
+        var data = {
+            max: max,
+            data: points
+        };
+        heatmapInstance.setData(data); //数据绑定还可以使用
+    }
+
+    function getAPLoc(cxt) {
+        $.get("/getAPsInfo",function (aps) {
+            $.each(aps,function(index,ap){
+                cxt.fillStyle="#FF0000";
+                cxt.beginPath();
+                cxt.arc(ap.y*1000/zoom,ap.x*1000/zoom,5,0,Math.PI*2,true)
+                cxt.closePath();
+                cxt.fill();
+                console.log(ap)
+            });
+        })
+    }
+
+    function buildMap(cxt) {
+
+        // cxt.rect(0,0,7000/zoom,6000/zoom);
+        // cxt.stroke();
+
+        cxt.beginPath();
+        cxt.moveTo(0/zoom,0/zoom);
+        cxt.lineTo(19195/zoom,0/zoom);
+        cxt.lineTo(19195/zoom,3990/zoom);
+        cxt.lineTo(16120/zoom,6700/zoom);
+        cxt.lineTo(16120/zoom,8140/zoom);
+        cxt.lineTo(11950/zoom,8140/zoom);
+        cxt.lineTo(11950/zoom,8790/zoom);
+        cxt.lineTo(11950/zoom,8790/zoom);
+        cxt.lineTo(5435/zoom,8790/zoom);
+        cxt.lineTo(5435/zoom,8090/zoom);
+        cxt.moveTo(5435/zoom,8140/zoom);
+        cxt.lineTo(0/zoom,8140/zoom);
+        cxt.lineTo(0/zoom,0/zoom);
+
+        cxt.stroke();
+
+        cxt.rect(0/zoom,4450/zoom,5320/zoom,3690/zoom);
+        cxt.stroke();
+
+        cxt.rect(0/zoom,0/zoom,2800/zoom,4450/zoom);
+        cxt.stroke();
+        cxt.rect(8365/zoom,0/zoom,3650/zoom,3210/zoom);
+        cxt.stroke();
+        // cxt.clearRect(6750/zoom,13850/zoom,200/zoom,1850/zoom);
+        // cxt.clearRect(5190/zoom,17200/zoom,1550/zoom,200/zoom);
+
+    }
+
+</script>
+</html>

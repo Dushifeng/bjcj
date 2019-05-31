@@ -59,7 +59,6 @@ public abstract class Localizer {
         content.append(new BigDecimal(Math.abs(y - returnVal.getY())).setScale(2, RoundingMode.UP).doubleValue());
         content.append(",");
         content.append(error);
-
         return content.toString();
     }
 

@@ -22,7 +22,7 @@ public class CleanRecordTask extends QuartzJobBean {
         long t = System.currentTimeMillis() - (time+1) * 1000;
         dataUtil.clearUpMessage(t);
         dataUtil.clearUpRecord(t);
-
+        dataUtil.clearUpLocVal(t);
 
     }
 }

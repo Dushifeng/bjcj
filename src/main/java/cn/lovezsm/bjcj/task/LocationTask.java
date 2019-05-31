@@ -45,12 +45,15 @@ public class LocationTask extends QuartzJobBean {
         Double[][] std = new Double[gridMap.getGridNum()][apConf.getApnum()*fingerPrints.size()];
         Double[][] avg = new Double[gridMap.getGridNum()][apConf.getApnum()*fingerPrints.size()];;
         for(int t=0;t<fingerPrints.size();t++){
+            if(fingerPrints.get(t)==null){
+                continue;
+            }
             Double[][] t_std = fingerPrints.get(t).getStd();
             Double[][] t_avg = fingerPrints.get(t).getAvg();
             for(int i=0;i<gridMap.getGridNum();i++){
                 for (int j=0;j<apConf.getApnum();j++){
-                    std[i][6*t+j] = t_std[i][j];
-                    avg[i][6*t+j] = t_avg[i][j];
+                    std[i][apConf.getApnum()*t+j] = t_std[i][j];
+                    avg[i][apConf.getApnum()*t+j] = t_avg[i][j];
                 }
             }
             if(fingerPrints.get(t).getName().equals("2G")){
@@ -61,7 +64,6 @@ public class LocationTask extends QuartzJobBean {
         fingerPrint.setAvg(avg);
         fingerPrint.setStd(std);
         fingerPrint.setStandardization(false);
-
 
         for(Record record:records){
             String key = record.getDevMac();
@@ -104,34 +106,29 @@ public class LocationTask extends QuartzJobBean {
                     rssi[i] = -100d;
                 }
             }
-            Double rssi_2_4[] = new Double[6];
-            Double rssi_all[] = new Double[18];
-            //准备2.4G信号rssi
-            for (int i=0;i<6;i++){
-                rssi_2_4[i] = rssi[i];
-            }
+
             int count = AlgorithmUtil.checkNotNullValCount(rssi);
             if(count<algorithmConf.getNotNullValMinCount()){
                 continue;
             }
-            Localizer localize1 = new LocalizeByFingerPrint(devMac,rssi_2_4,k,fingerPrint_2_4,gridMap,"v1");
-            LocalizeReturnVal val1 = localize1.doCalculate();
-            Localizer localize2 = new LocalizeByFingerPrintV2(devMac,rssi_2_4,k,fingerPrint_2_4,gridMap,"v2");
-            LocalizeReturnVal val2 = localize2.doCalculate();
+
+            Double[] rssi_2_4 = new Double[rssi.length/10];
+            for(int i =0;i<rssi_2_4.length;i++){
+                rssi_2_4[i] = rssi[i];
+            }
+
+
+//            Localizer localize1 = new LocalizeByFingerPrint(devMac,rssi_2_4,k,fingerPrint_2_4,gridMap,"v1");
+//            LocalizeReturnVal val1 = localize1.doCalculate();
+//            Localizer localize2 = new LocalizeByFingerPrintV2(devMac,rssi_2_4,k,fingerPrint_2_4,gridMap,"v2");
+//            LocalizeReturnVal val2 = localize2.doCalculate();
             Localizer localize3 = new LocalizeByFingerPrintV2(devMac,rssi,k,fingerPrint,gridMap,"v3");
             LocalizeReturnVal val3 = localize3.doCalculate();
-            Long time = System.currentTimeMillis();
-            String log1 = localize1.log(logUtil.getLogConf().getX(), logUtil.getLogConf().getY(), time);
-            String log2 = localize2.log(logUtil.getLogConf().getX(), logUtil.getLogConf().getY(), time);
-            String log3 = localize3.log(logUtil.getLogConf().getX(), logUtil.getLogConf().getY(), time);
-
-            logUtil.log(log1,"/vision_1_log.log");
-            logUtil.log(log2,"/vision_2_log.log");
-            logUtil.log(log3,"/vision_3_log.log");
+            val3.setUpdateTime(System.currentTimeMillis());
+            val3.setDevMac(devMac);
+            dataUtil.updateLocVal(val3);
         }
-
-
-
+        System.out.println("个数："+valueMap.keySet().size());
 //            dataUtil.updateLocVal(val);
         }
 

@@ -6,15 +6,11 @@ import cn.lovezsm.bjcj.data.FingerPrint;
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
 import cn.lovezsm.bjcj.entity.Message;
 import cn.lovezsm.bjcj.entity.Record;
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -47,8 +43,7 @@ public class DataUtil {
     DataFilter dataFilter;
 
 
-    @Autowired
-    MongoOperations operations;
+
 
     public void saveAndClearUpOffsetMap(){
 //        offsetMap.put("saveTime",System.currentTimeMillis());

@@ -13,6 +13,15 @@ public class LocalizeReturnVal implements Cloneable,Serializable {
     private List<Double> probCandidate = new ArrayList<>();
     private Long updateTime;
     private String devMac;
+    private boolean valid = true;
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
 
     public int getFrequency() {
         return frequency;

@@ -38,7 +38,6 @@ public class LocalizeByFingerPrint extends Localizer {
         super(mac,rssi, k, fingerPrint, gridMap,vision);
     }
     public LocalizeReturnVal doCalculate(){
-
         if(fingerPrint.isStandardization()){
             //标准化rssi
             AlgorithmUtil.VectorStandardization(rssi);
@@ -50,12 +49,12 @@ public class LocalizeByFingerPrint extends Localizer {
         for(int i =0;i<apNum;i++){
             //计算该AP在每一个晶格探测到该设备的概率值
             double[] fFusionTemp = AlgorithmUtil.getMatrix(gridNum,0);
-            for (int ng =0;ng<gridNum;ng++){
-                // (1/(sqrt(2*pi)*rssStd(num_grid, j )))*exp((rss(j)-rssMean(num_grid,j))^2/(-2*rssStd(num_grid,j)^2));
-                if(fingerPrint.getStd()[ng][i]==0){
-                    fingerPrint.getStd()[ng][i]=0.1;
-                }
-                fFusionTemp[ng] = (1/(Math.sqrt(2*Math.PI)*fingerPrint.getStd()[ng][i]))*Math.exp((rssi[i]-fingerPrint.getAvg()[ng][i])*(rssi[i]-fingerPrint.getAvg()[ng][i])/(-2*fingerPrint.getStd()[ng][i]*fingerPrint.getStd()[ng][i]));
+                for (int ng =0;ng<gridNum;ng++){
+                    // (1/(sqrt(2*pi)*rssStd(num_grid, j )))*exp((rss(j)-rssMean(num_grid,j))^2/(-2*rssStd(num_grid,j)^2));
+                    if(fingerPrint.getStd()[ng][i]==0){
+                        fingerPrint.getStd()[ng][i]=0.1;
+                    }
+                    fFusionTemp[ng] = (1/(Math.sqrt(2*Math.PI)*fingerPrint.getStd()[ng][i]))*Math.exp((rssi[i]-fingerPrint.getAvg()[ng][i])*(rssi[i]-fingerPrint.getAvg()[ng][i])/(-2*fingerPrint.getStd()[ng][i]*fingerPrint.getStd()[ng][i]));
                //累乘概率值，得到该设备在每一个晶格的似然值
                 fFusion[ng] = fFusion[ng]*fFusionTemp[ng];
             }
@@ -65,6 +64,7 @@ public class LocalizeByFingerPrint extends Localizer {
         for(int i = 0;i<gridNum;i++){
             fFusion[i]=fFusion[i]*gridMap.getPosH()[i]*gridMap.getPosW()[i];
         }
+
 
         AlgorithmUtil.normalized(fFusion);
         //使用WKNN算法，计算位置估计

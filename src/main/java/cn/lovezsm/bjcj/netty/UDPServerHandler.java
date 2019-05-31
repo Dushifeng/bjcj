@@ -48,7 +48,6 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         String str = this.filter(s);
 //
         if(str!=null){
-
             List<Message> messages = dataUtil.analyzeData(str,null);
             if(messages.size()>0){
 //                logUtil.logRaw(messages);

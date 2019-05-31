@@ -82,7 +82,7 @@ public class AlgorithmUtil {
     public static int checkNotNullValCount(Double[] doubles) {
         int count=0;
         for (Double d:doubles){
-            if(d!=-100&&d!=null){
+            if(d!=-100d&&d!=null){
                 count++;
             }
         }

@@ -13,10 +13,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -433,5 +430,19 @@ public class CommonTests {
 
     }
 
+    @Test
+    public void genGridFile() throws IOException {
+        FileWriter fileWriter = new FileWriter("C:\\data\\DS0517\\grid.txt");
+        int index = 1;
+        for(int i=0;i<=18;i++){
+            for(int j=0;j<=8;j++){
+
+                fileWriter.append(index+"_"+(j+0.5)+"_"+(i+0.5)+"_1_1_1");
+                fileWriter.append("\r\n");
+                index++;
+            }
+        }
+        fileWriter.close();
+    }
 
 }

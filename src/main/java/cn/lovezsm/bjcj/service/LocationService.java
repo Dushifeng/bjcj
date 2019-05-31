@@ -1,8 +1,11 @@
 package cn.lovezsm.bjcj.service;
 
+import cn.lovezsm.bjcj.algorithm.CalculateDeviceDensity;
 import cn.lovezsm.bjcj.algorithm.LocalizeByFingerPrint;
 
 import cn.lovezsm.bjcj.config.GlobeConf;
+import cn.lovezsm.bjcj.entity.CalculateDeviceDensityReturnVal;
+import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
 import cn.lovezsm.bjcj.task.*;
 import cn.lovezsm.bjcj.utils.DataUtil;
 import cn.lovezsm.bjcj.data.FingerPrint;
@@ -15,6 +18,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+
+import java.util.List;
 
 import static org.quartz.DateBuilder.futureDate;
 import static org.quartz.JobBuilder.newJob;
@@ -37,6 +42,9 @@ public class LocationService {
     @Autowired
     GlobeConf globeConf;
     JobDataMap jobDataMapProcessRawDataTask;
+
+    @Autowired
+    CalculateDeviceDensity calculateDeviceDensity;
 
     @PostConstruct
     public void init(){
@@ -107,6 +115,11 @@ public class LocationService {
         scheduler.scheduleJob(newJob(CleanOffsetTask.class).withIdentity("OffsetTask").build(), triggerOffsetTask);
 
 
+    }
+
+
+    public CalculateDeviceDensityReturnVal calculateDeviceDensity(List<LocalizeReturnVal> localizeReturnVals){
+        return calculateDeviceDensity.doCalculate(localizeReturnVals);
     }
 
 }

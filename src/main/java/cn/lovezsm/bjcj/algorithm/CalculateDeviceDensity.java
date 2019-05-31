@@ -1,5 +1,6 @@
 package cn.lovezsm.bjcj.algorithm;
 
+import cn.lovezsm.bjcj.config.GlobeConf;
 import cn.lovezsm.bjcj.data.FingerPrint;
 import cn.lovezsm.bjcj.entity.CalculateDeviceDensityReturnVal;
 import cn.lovezsm.bjcj.entity.LocalizeReturnVal;
@@ -37,58 +38,35 @@ import java.util.List;
  * % rssSlidingWindow每行中的每个元素表示对应AP的RSS值，如果对应AP没有探测到该设备，则取值-200
  *
  */
-
+@Component
 public class CalculateDeviceDensity {
-//    @Autowired
-//    FingerPrint fingerPrint;
-//
-//    Double[][] avg;
-//    Double[][] std;
-//    double[][] posGrid;
-//    double[] areaGrid;
-//    int gridNum;
-//
-//    double[] posX;
-//    double[] posY;
-//
-////    @Value("${algorithm.sliding_step_time}")
-//    public int delta;
-//
-//    @PostConstruct
-//    public void init(){
-//        avg = fingerPrint.getAvg();
-//        std = fingerPrint.getStd();
-//        gridNum = fingerPrint.getGridNum();
-//        posGrid = fingerPrint.getPosGrid();
-//        areaGrid = fingerPrint.getAreaGrid();
-//        posX = fingerPrint.getPosX();
-//        posY = fingerPrint.getPosY();
-//    }
-//
-//
-//    public CalculateDeviceDensityReturnVal doCalculate(List<LocalizeReturnVal> records){
-//        double[] deviceDensity = new double[gridNum];
-//        double[] newDensity = new double[gridNum];
-//        for(LocalizeReturnVal lr:records){
-//            if(lr == null){
-//                continue;
-//            }
-//            List<Integer> idxCandidate = lr.getIdxCandidate();
-//            List<Double> probCandidate = lr.getProbCandidate();
-//            for(int i=0;i<idxCandidate.size();i++){
-//                int idx = idxCandidate.get(i);
-//                deviceDensity[idx] = deviceDensity[idx]+probCandidate.get(i);
-//                if(lr.getUpdateTime()>=System.currentTimeMillis()-delta*1000){
-//                    newDensity[idx] = deviceDensity[idx]+probCandidate.get(i);
-//                }
-//            }
-//        }
-//        CalculateDeviceDensityReturnVal cddr = new CalculateDeviceDensityReturnVal();
-//        cddr.setDeviceDensity(deviceDensity);
-//        cddr.setNewDensity(newDensity);
-//        cddr.setPosX(posX);
-//        cddr.setPosY(posY);
-//        return cddr;
-//    }
+    @Autowired
+    GlobeConf globeConf;
+
+    public CalculateDeviceDensityReturnVal doCalculate(List<LocalizeReturnVal> records){
+
+        double[] deviceDensity = new double[globeConf.getGridMap().getGridNum()];
+        double[] newDensity = new double[globeConf.getGridMap().getGridNum()];
+        for(LocalizeReturnVal lr:records){
+            if(lr == null){
+                continue;
+            }
+            List<Integer> idxCandidate = lr.getIdxCandidate();
+            List<Double> probCandidate = lr.getProbCandidate();
+            for(int i=0;i<idxCandidate.size();i++){
+                int idx = idxCandidate.get(i);
+                deviceDensity[idx] = deviceDensity[idx]+probCandidate.get(i);
+                if(lr.getUpdateTime()>=System.currentTimeMillis()-globeConf.getAlgorithmConf().getSliding_step_time()*1000){
+                    newDensity[idx] = deviceDensity[idx]+probCandidate.get(i);
+                }
+            }
+        }
+        CalculateDeviceDensityReturnVal cddr = new CalculateDeviceDensityReturnVal();
+        cddr.setDeviceDensity(deviceDensity);
+        cddr.setNewDensity(newDensity);
+        cddr.setPosX(globeConf.getGridMap().getPosX());
+        cddr.setPosY(globeConf.getGridMap().getPosY());
+        return cddr;
+    }
 
 }

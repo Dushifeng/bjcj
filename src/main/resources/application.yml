@@ -7,84 +7,80 @@ spring:
     static-locations: classpath:/templates/,classpath:/static/
   thymeleaf:
     cache: false
-  data:
-    mongodb:
-      uri: mongodb://192.168.0.148:27017/bjcj
+
+
+#  data:
+#    mongodb:
+#      uri: mongodb://192.168.0.148:27017/bjcj
 udp:
-  port: 16663
-  open: true
+  port: 16661
+
 log:
   grid_id: -1
   raw_path: ${log.dicPath}/rows_${log.grid_id}.log
   loc_result_path: ${log.dicPath}/locresult_${log.grid_id}.log
   record_path: ${log.dicPath}/record_${log.grid_id}.log
   dicPath: C:/log/4-24-${random.int}
-  open: true
-#60-61
-  x: 35.0
-  y: 8.3
-#  #1 143-144
-#  x: 21.5d
-#  y: 17.3d
-#2 74-75
-#  x: 23.5d
-#  y: 14.3d
-#3  唐总办公室 153-154
-#  x: 30d
-#  y: 17.8d
-#4 信号差  王总办公室
-#  x: 37d
-#  y: 18.8d
-#5 会议室 信号差 苹果5G
-#  x: 34d
-#  y: 7.8d
-#6 45-46
-#  x: 18.5d
-#  y: 13.3d
-#7
-#  x: 16.5d
-#  y: 18.3d
-
-
-#  x: 19.5d  #70-71
-#  y: 14.3d
-
-#  x: 16.5d
-#  y: 19.3d
-
-#  x: 16.5d
-#  y: 13.3d
-
+  open: false
 
 default:
   algorithmConf:
-    sliding_window_time: 180
-    sliding_step_time: 10
+    sliding_window_time: 90
+    sliding_step_time: 8
     k: 6
-    not_null_val_min_count: 5
-    offset_not_null_val: 6
-    offsetOpen: false
+    not_null_val_min_count: 6
+    offset_not_null_val: 5
+    offsetOpen: true
   apConf:
     info:
-      - mac: 70476002a30b
-        x: 35
-        y: 6.3
-      - mac: 70476002a30c
-        x: 39
-        y: 9.3
-      - mac: 70476002a30d
-        x: 33
-        y: 16.3
-      - mac: 70476002a701
-        x: 17
-        y: 14.3
-      - mac: 70476002a30f
-        x: 22
-        y: 19.3
-      - mac: 70476002a30a
-        x: 27
-        y: 13.8
-
+      - mac: 70476001a301
+        x: 13
+        y: 7.6
+      - mac: 70476001a302
+        x: 6
+        y: 15
+      - mac: 70476001a303
+        x: 8.5
+        y: 25
+      - mac: 70476002a301
+        x: 20
+        y: 12
+      - mac: 70476002a307
+        x: 6
+        y: 38
+      - mac: 70476002a308
+        x: 12
+        y: 47
+      - mac: 70476002a309
+        x: 13
+        y: 29
+      - mac: 70476002a310
+        x: 1
+        y: 47
+      - mac: 70476002a311
+        x: 1
+        y: 29
+      - mac: 70476002a312
+        x: 16
+        y: 22
+#          - mac: 70476002a30b
+#            x: 6
+#            y: 3
+#          - mac: 70476002a30c
+#            x: 7
+#            y: 8
+#          - mac: 70476002a30d
+#            x: 7
+#            y: 14.5
+#          - mac: 70476002a701
+#            x: 2
+#            y: 4
+#          - mac: 70476002a30f
+#            x: 2
+#            y: 10
+#          - mac: 70476002a30a
+#            x: 2
+#            y: 18
   messageConf:
     type:
       00: direct-wifi
@@ -96,15 +92,31 @@ default:
       06: indirect-ap
     rssi-min: -110
     mac-allow:
-        - 240995b2909c #旧荣耀
+#        - 240995b2909c #旧荣耀
 #        - 8844771b6789 #华为mate9
 #        - 34d712a2e3dc #锤子
 #        - b8bc1bdbeadd #huawei p8
 #        - 708a096219a1 #徐磊
 #        - 00cdfe012d4c #苹果
     mac-refuse:
-
   jobConf:
     job_switch:
       {udp_server: false,record_server: false,location_server: false,clean_up_server: false}
+  fileConf:
+    gridFile: C:\data\BJCJ0507\grid.txt
+    avgPath_2G: C:\data\BJCJ0507\Fingerprint_avg_2GHZ.dat
+    stdPath_2G: C:\data\BJCJ0507\Fingerprint_std_2GHZ.dat
+    avgPath_5G_G100: C:\data\BJCJ0507\Fingerprint_avg_5G_G100.dat
+    stdPath_5G_G100: C:\data\BJCJ0507\Fingerprint_std_5G_G100.dat
+    avgPath_5G_L100: C:\data\BJCJ0507\Fingerprint_avg_5G_L100.dat
+    stdPath_5G_L100: C:\data\BJCJ0507\Fingerprint_std_5G_L100.dat
+
+#    gridFile: C:\data\DS0517\grid.txt
+#    avgPath_2G: C:\data\DS0517\Fingerprint_avg_240995B2909C_2G.dat
+#    stdPath_2G: C:\data\DS0517\Fingerprint_std_240995B2909C_2G.dat
+#    avgPath_5G_G100: C:\data\DS0517\Fingerprint_avg_240995B2909C_5G_G100.dat
+#    stdPath_5G_G100: C:\data\DS0517\Fingerprint_std_240995B2909C_5G_G100.dat
+#    avgPath_5G_L100: C:\data\DS0517\Fingerprint_avg_240995B2909C_5G_L100.dat
+#    stdPath_5G_L100: C:\data\DS0517\Fingerprint_std_240995B2909C_5G_L100.dat
+
 

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-table/1.13.5/bootstrap-table.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="row">
+    <div class="col-6" id="showArea1">
+        <div style="margin: 0 auto;width: 400px">
+            <canvas width="550" height="800" id="map" ></canvas>
+        </div>
+    </div>
+    <div class="col-6" id="showArea2">
+        <div style="margin: 0 auto;width: 400px" id="dm">
+            <canvas width="550" height="800" id="map2" ></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">2.4G设备个数</span>
+                </div>
+                <input class="form-control" id="count_2G" disabled>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">5.8G设备个数</span>
+                </div>
+                <input class="form-control" id="count_5G" disabled>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Mac</span>
+                </div>
+                <input class="form-control" id="macInput">
+            </div>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-primary btn-block" id="showError">过滤</button>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/heatmap.js/2.0.2/heatmap.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.13.5/locale/bootstrap-table-zh-CN.min.js"></script>
+<script>
+    var canvas_width=1460
+    var canvas_height=760
+    var mac_allow = ""
+    var zoom_x = 13.44
+    var zoom_y = 13.52
+    var offset_x = 72
+    var offset_y = 11
+    var restrictedArea = [
+        {x1:72,y1:11,x2:166,y2:92},
+        {x1:69,y1:92,x2:163,y2:118},
+        {x1:263,y1:10,x2:455,y2:92},
+        {x1:358,y1:92,x2:497,y2:173},
+        {x1:263,y1:666,x2:396,y2:748},
+    ]
+    function isInRestrictedArea(x,y){
+        $.each(restrictedArea,function(index,pos){
+            console.log(pos.x1+" "+pos.x2+"  "+pos.y1+" "+pos.y2)
+            if(x>=pos.x1&&x<=pos.x2&&y>=pos.y1&&y<=pos.y2){
+                return true
+            }
+        })
+        return false
+    }
+    $(function () {
+        var c=document.getElementById("map");
+        var cxt=c.getContext("2d");
+
+        var c2=document.getElementById("map2");
+        var cxt2=c2.getContext("2d");
+
+
+        // c.addEventListener('click', function(e){
+        //     p = getEventPosition(e);
+        //     console.log(p)
+        //     alert(p.x+"  "+p.y)
+        // }, false);
+        buildMap(cxt);
+        buildMap(cxt2);
+        // getAPLoc(cxt)
+        setInterval("getLocInfo()",1000);
+        // setInterval(getHeatMapData,5000);
+        $("#showError").click(search)
+    })
+
+    function getEventPosition(ev){
+        var x, y;
+        if (ev.layerX || ev.layerX == 0) {
+            x = ev.layerX;
+            y = ev.layerY;
+        } else if (ev.offsetX || ev.offsetX == 0) { // Opera
+            x = ev.offsetX;
+            y = ev.offsetY;
+        }
+        return {x: x, y: y};
+    }
+
+    function search() {
+        mac_allow=""
+
+        console.log("hello...")
+        var m = $("#macInput").val()
+        m = m.toLowerCase().trim()
+        for(var i=0;i<m.length;i++){
+            if(m[i]!=':'){
+                mac_allow+=m[i]
+            }
+        }
+    }
+    function getLocInfo() {
+        var c=document.getElementById("map");
+        var cxt=c.getContext("2d");
+        c.height=c.height;
+        buildMap(cxt);
+        // getAPLoc(cxt)
+        var count_2 = 0;
+        var count_5 = 0;
+        $.get("/getLocInfo", function(ans){
+            $.each(ans.locPoint,function(index,dev){
+                cxt.fillStyle="#FF0000";
+                if(dev.frequency==2){
+                    count_2++
+                }else {
+                    count_5++
+                }
+                if((mac_allow!=""&&mac_allow.toLowerCase()==dev.devMac.toLowerCase())||mac_allow==""){
+                    x = dev.x*zoom_x+offset_x
+                    y = dev.y*zoom_y+offset_y
+                    if(isInRestrictedArea(x,y)==false){
+                        cxt.beginPath();
+                        cxt.arc(x,y,3,0,Math.PI*2,true)
+                        cxt.closePath();
+                        cxt.fill();
+                    }
+                }
+            });
+            $("#count_2G").val(count_2)
+            $("#count_5G").val(count_5)
+             // upDateHeatMap(ans.heatMap)
+        });
+    }
+    var heatmapInstance = h337.create({
+        container: document.querySelector('#dm'),
+    });
+    function upDateHeatMap(data) {
+        var points = [];
+        var max = 0;
+        var len = 1134;
+        while (len--) {
+            var val = data.deviceDensity[len]
+            max = Math.max(max, val);
+            var point = {
+                x: data.posX[len]*1000/zoom,
+                y: data.posY[len]*1000/zoom,
+                value: val
+            };
+            points.push(point);
+
+        }
+        var data = {
+            max: max,
+            data: points
+        };
+        heatmapInstance.setData(data); //数据绑定还可以使用
+        console.log(data)
+    }
+
+    function getAPLoc(cxt) {
+        $.get("/getAPsInfo",function (aps) {
+            $.each(aps,function(index,ap){
+                cxt.fillStyle="#FF0000";
+                cxt.beginPath();
+                cxt.arc(ap.x*zoom_x+offset_x,ap.y*zoom_y+offset_y,3,0,Math.PI*2,true)
+                cxt.closePath();
+                cxt.fill();
+            });
+        })
+    }
+    var baseMap=new Image()
+    baseMap.src="bjcj.png"
+    function buildMap(cxt) {
+        cxt.drawImage(baseMap, 0, 0,527.15,800)
+        // $.get("/getAPsInfo",function (aps) {
+        //     $.each(aps,function(index,ap){
+        //         cxt.fillStyle="#FF0000";
+        //         cxt.beginPath();
+        //         cxt.arc(ap.x*zoom_x,ap.y*zoom_y,3,0,Math.PI*2,true)
+        //         cxt.closePath();
+        //         cxt.fill();
+        //     });
+        // })
+        // cxt.rect(0,0,7000/zoom,6000/zoom);
+        // cxt.stroke();
+        // cxt.rect(7000/zoom,0/zoom,7000/zoom,6000/zoom);
+        // cxt.stroke();
+        // cxt.rect(14000/zoom,0/zoom,7000/zoom,6000/zoom);
+        // cxt.stroke();
+        // cxt.rect(21000/zoom,0/zoom,7000/zoom,6000/zoom);
+        // cxt.stroke();
+        //
+        // cxt.rect(0/zoom,6000/zoom,6800/zoom,2000/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,8000/zoom,6800/zoom,9300/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,17300/zoom,5150/zoom,8350/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,25650/zoom,5150/zoom,4950/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,30600/zoom,5150/zoom,3000/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,33600/zoom,5150/zoom,4700/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,38300/zoom,5150/zoom,3000/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,41300/zoom,5150/zoom,6650/zoom);
+        // cxt.stroke();
+        // cxt.rect(0/zoom,47950/zoom,7000/zoom,6110/zoom);
+        // cxt.stroke();
+        // cxt.rect(7000/zoom,47950/zoom,7000/zoom,6110/zoom);
+        // cxt.stroke();
+        // cxt.rect(14000/zoom,47950/zoom,7000/zoom,6110/zoom);
+        // cxt.stroke();
+        // cxt.rect(21000/zoom,47950/zoom,7000/zoom,6110/zoom);
+        // cxt.stroke();
+        //
+        // cxt.beginPath();
+        // cxt.moveTo(23650/zoom,47950/zoom);
+        // cxt.lineTo(23650/zoom,54000/zoom);
+        // cxt.stroke();
+        //
+        // cxt.rect(21000/zoom,6000/zoom,7000/zoom,6150/zoom);
+        // cxt.stroke();
+        // cxt.rect(21000/zoom,12150/zoom,7000/zoom,29650/zoom);
+        // cxt.stroke();
+        // cxt.rect(21000/zoom,41800/zoom,7000/zoom,6200/zoom);
+        // cxt.stroke();
+        //
+        // cxt.rect(14000/zoom,15800/zoom,5300/zoom,5650/zoom);
+        // cxt.stroke();
+        // cxt.rect(14000/zoom,21450/zoom,5300/zoom,4050/zoom);
+        // cxt.stroke();
+        // cxt.rect(14000/zoom,25500/zoom,5300/zoom,6600/zoom);
+        // cxt.stroke();
+        // cxt.rect(14000/zoom,32100/zoom,5300/zoom,14150/zoom);
+        // cxt.stroke();
+        // cxt.rect(6800/zoom,17800/zoom,7150/zoom,3120/zoom);
+        // cxt.stroke();
+        // cxt.beginPath();
+        // cxt.moveTo(9550/zoom,17800/zoom);
+        // cxt.lineTo(9550/zoom,20920/zoom);
+        // cxt.stroke();
+        // cxt.rect(6800/zoom,20920/zoom,7150/zoom,8880/zoom);
+        // cxt.stroke();
+        // cxt.rect(6800/zoom,29800/zoom,7150/zoom,16450/zoom);
+        // cxt.stroke();
+        // cxt.beginPath();
+        // cxt.moveTo(6800/zoom,17300/zoom);
+        // cxt.lineTo(6800/zoom,17900/zoom);
+        // cxt.stroke();
+        //
+        // cxt.beginPath();
+        // cxt.moveTo(8445/zoom,7600/zoom);
+        // cxt.lineTo(12445/zoom,7600/zoom);
+        // cxt.stroke();
+        //
+        // cxt.beginPath();
+        // cxt.moveTo(10900/zoom,0/zoom);
+        // cxt.lineTo(10900/zoom,3850/zoom);
+        // cxt.stroke();
+        // cxt.rect(8650/zoom,3850/zoom,3600/zoom,2100/zoom);
+        // cxt.stroke();
+        //
+        // cxt.beginPath();
+        // cxt.moveTo(5150/zoom,13850/zoom);
+        // cxt.lineTo(6800/zoom,13850/zoom);
+        // cxt.stroke();
+        // cxt.beginPath();
+        // cxt.moveTo(5150/zoom,13850/zoom);
+        // cxt.lineTo(5150/zoom,17300/zoom);
+        // cxt.stroke();
+        //
+        // cxt.clearRect(6750/zoom,13850/zoom,200/zoom,1850/zoom);
+        // cxt.clearRect(5190/zoom,17200/zoom,1550/zoom,200/zoom);
+        //
+        // cxt.font = 'bold 10px Arial';
+        // cxt.textAlign = 'center';
+        // cxt.fillStyle = '#000';
+        // cxt.strokeText("卫生间", 150, 100);
+
+
+
+        // // cxt.rect(800,50,700,1400);
+        // cxt.fillStyle="#FF0000";
+        // cxt.beginPath();
+        // loc = getPixCol(0,0)
+        // cxt.arc(loc[0]-15,loc[1]-15,-15,0,Math.PI*2,true);
+        // cxt.closePath();
+        // cxt.fill();
+    }
+
+
+</script>
+</html>

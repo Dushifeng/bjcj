@@ -63,7 +63,7 @@ public class ProcessRawDataTask extends QuartzJobBean {
             }
             Double[] rssiArray = rssiMap.get(devMac);
             int frequencyCoefficient = apConf.getFrequencyCoefficient(frequency);
-            int rssi_loc = frequencyCoefficient*6+apConf.getApId(apMac);
+            int rssi_loc = frequencyCoefficient*apConf.getApnum()+apConf.getApId(apMac);
             rssiArray[rssi_loc] = avgRssi;
         }
 
@@ -78,10 +78,6 @@ public class ProcessRawDataTask extends QuartzJobBean {
             records.add(record);
         }
 //        logUtil.logRecord(records);
-        for(Record record:records){
-            logUtil.log(record.toString(),record.getDevMac()+"_"+logUtil.getLogConf().getGridId()+"_"+logUtil.getLogConf().getX()+"_"+logUtil.getLogConf().getY()+"_"+"record.log");
-            System.out.println(record);
-        }
         dataUtil.putRecord(records);
     }
 }

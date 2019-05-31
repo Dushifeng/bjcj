@@ -28,6 +28,9 @@ public class FingerPrintBuilderByFile extends FingerPrintBuilder{
             Scanner stdSc = new Scanner(stdFile);
             for(int ln = 0;ln<gridNum;ln++){
                 for(int j = 0;j<apNum;j++){
+                    if(avgSc.hasNext()==false||stdSc.hasNext()==false){
+                        break;
+                    }
                     avg[ln][j] = avgSc.nextDouble();
                     std[ln][j] = stdSc.nextDouble();
                 }
